@@ -1,5 +1,5 @@
 import CL_logo from '@/assets/cbs_logo.png';
-import CL_Icon from '@/assets/cbs_logo.png';
+import CL_Icon from '@/assets/CBS_i.png';
 import { useSidebar } from './SidebarProvider';
 import { SidebarTrigger } from './SidebarTrigger';
  
@@ -13,7 +13,7 @@ export default function SidebarLogo() {
     <div className="relative flex items-center justify-start gap-3 px-4 py-2 h-14">
       {/* Logo Box */}
       {!showLabels && (
-        <div className="w-10 h-9 flex items-center justify-start">
+        <div className="w-10 h-9 flex items-center justify-start pl-1">
             <img
               src={CL_Icon}
               alt="CBS Logo"
