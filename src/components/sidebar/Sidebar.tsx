@@ -38,7 +38,7 @@ export function Sidebar({ children }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col h-screen bg-white shadow-md border-r bg-sidebar-primary',
+        'hidden md:flex flex-col h-screen bg-white shadow-md border-r bg-sidebar-primary font-inter',
         state === 'expanded' ? 'w-64' : 'w-20'
       )}
     >

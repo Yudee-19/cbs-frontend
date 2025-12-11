@@ -61,7 +61,11 @@ export default function ProfileMenu({ name = '', email, avatar, isCollapsed }: P
       <div className="flex items-center justify-center pt-3">
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="p-0 w-10 h-10 rounded-full overflow-hidden">
+            <Button
+              variant="ghost"
+              className="p-0 w-10 h-10 rounded-full overflow-hidden"
+              aria-expanded={open}
+            >
               <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center">
                 {Avatar}
               </div>
@@ -96,27 +100,53 @@ export default function ProfileMenu({ name = '', email, avatar, isCollapsed }: P
   // Expanded: avatar + name + email, chevron + small action icons on the right (matches provided design)
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          className="flex items-center gap-3 w-full px-3 py-2 bg-transparent hover:bg-white/5 rounded-md justify-start"
-          aria-expanded={open}
-        >
-          <div className="w-9 h-9 rounded-full overflow-hidden ring-1 ring-white/10">{Avatar}</div>
+      {/* keep trigger as a single child; place logout icon as a sibling */}
+      <div className="flex items-center w-full justify-between px-0 py-1 rounded-md">
+        <DropdownMenuTrigger asChild>
+          <Button
+            className="flex items-center gap-3 flex-1 bg-transparent hover:bg-white/5 rounded-md justify-start"
+            aria-expanded={open}
+          >
+            <div className="w-9 h-9 rounded-full overflow-hidden ring-1 ring-white/10">{Avatar}</div>
 
-          <div className="flex-1 text-left">
-            <div className="text-sm font-semibold text-white leading-tight">{name}</div>
-            {email && <div className="text-[12px] text-gray-300">{email}</div>}
-          </div>
-          {open ? (
-            <ChevronUp className="w-4 h-4 text-white/80" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-white/80" />
-          )}
-          <div className="flex items-center gap-2">
+            <div className="flex-1 text-left">
+              <div className="text-xs font-semibold text-white leading-tight">{name}</div>
+              {email && <div className="text-[12px] text-gray-300">{email}</div>}
+            </div>
+            {open ? (
+              <ChevronUp className="w-4 h-4 text-white/80" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-white/80" />
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+
+        {/* logout action must not open the menu */}
+        <div className="flex items-center gap-2 ml-2">
+          <button
+            type="button"
+            onPointerDownCapture={(e) => {
+              // intercept before DropdownMenuTrigger receives the event
+              e.stopPropagation();
+            }}
+            onMouseDown={(e) => {
+              // extra guard for mouse events
+              e.stopPropagation();
+            }}
+            onAuxClick={(e) => {
+              e.stopPropagation();
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLogout();
+            }}
+            className="p-1 rounded-md hover:bg-white/10"
+            aria-label="Logout"
+          >
             <UserPlus className="w-4 h-4 text-white/80" />
-          </div>
-        </Button>
-      </DropdownMenuTrigger>
+          </button>
+        </div>
+      </div>
 
       <DropdownMenuContent className="w-56 mt-2 rounded-xl shadow-lg bg-white p-1" align="end">
         <DropdownMenuItem className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer flex items-center">

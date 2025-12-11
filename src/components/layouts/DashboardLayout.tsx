@@ -17,7 +17,7 @@ export default function DashboardLayout() {
             <Header />
           </header>
 
-          <main className="flex-1 p-2 bg-gray-50 overflow-auto">
+          <main className="flex-1 p-2 bg-gray-50 overflow-auto font-poppins">
             <Outlet />
           </main>
         </div>

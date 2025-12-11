@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import type { TablePaginationProps } from '@/interfaces';
+// import type { TablePaginationProps } from '@/interfaces';
 import {
   Select,
   SelectContent,
@@ -8,6 +8,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
+export interface TablePaginationProps {
+  total: number;
+  page: number;
+  rowsPerPage: number;
+  onPageChange: (page: number) => void;
+  onRowsPerPageChange: (rows: number) => void;
+}
 
 const TablePagination: React.FC<TablePaginationProps> = ({
   total,

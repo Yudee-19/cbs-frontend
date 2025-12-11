@@ -87,7 +87,7 @@ export function SidebarMenu() {
           <div className="flex items-center gap-2 min-w-0 text-sm">
             {Icon && <Icon size={16} />}
             {showLabels && (
-              <span className="whitespace-nowrap overflow-hidden text-ellipsis text-xs">
+              <span className="whitespace-nowrap overflow-hidden text-ellipsis text-sm">
                 {item.label}
               </span>
             )}
@@ -155,7 +155,7 @@ export function SidebarMenu() {
       >
         {Icon && <Icon size={16} />}
         {showLabels && (
-          <span className="whitespace-nowrap overflow-hidden text-ellipsis text-xs">
+          <span className="whitespace-nowrap overflow-hidden text-ellipsis text-sm">
             {item.label}
           </span>
         )}
