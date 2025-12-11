@@ -117,7 +117,7 @@ export function SidebarMenu() {
                       ${
                         childIsActive
                           ? 'text-white hover:bg-primary/50 bg-primary/50 '
-                          : 'text-white hover:text-white hover:bg-primary/50 mt-1'
+                          : 'text-white hover:text-white hover:bg-primary/50 mt-1 mb-1'
                       }
                       ${isCollapsed ? 'justify-center' : 'gap-3'}
                     `}
