@@ -125,7 +125,7 @@ export function SidebarMenu() {
                     <div className="flex items-center p-2 rounded-lg m-1 transition ml-7">
                       {child.icon && <child.icon size={14} />}
                       {showLabels && (
-                        <span className="whitespace-nowrap overflow-hidden text-ellipsis pl-1">
+                        <span className="whitespace-nowrap overflow-hidden text-ellipsis pl-2">
                           {child.label}
                         </span>
                       )}
