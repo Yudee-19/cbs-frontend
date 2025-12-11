@@ -73,6 +73,23 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: 'it/sim-management', // becomes /it/software
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            {/* <ItSupport /> */}
+            <div>SIM Management Page - Coming Soon</div>
+          </Suspense>
+        ),
+      },
+      {
+        path: 'it/hardware-transfer', // becomes /it/software
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <div>Hardware Transfer Page - Coming Soon</div>
+          </Suspense>
+        ),
+      },
     ],
   },
   // optional: keep /dashboard working as redirect to root
