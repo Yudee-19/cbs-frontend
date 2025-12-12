@@ -25,8 +25,20 @@ const Equipment = lazy(
 );
 
 const ItSupport = lazy(
-    () => import('@/pages/it/itSupport/ItSupportPage')
+  () => import('@/pages/it/itSupport/ItSupportPage')
 )
+
+const SimPage = lazy(() => import('@/pages/it/Sim/Simpage'));
+
+const HardwareTransferPage = lazy(() => import('@/pages/it/HardwareTansfer/HardwareTansferPage'));
+const LandBuildingPage = lazy(() => import('@/pages/assets/LandBuilding/LandBuildingPage'));
+const VehiclePage = lazy(() => import('@/pages/assets/Vechicle/VechiclePage'));
+const EquipmentPage = lazy(() => import('@/pages/assets/Equipment/EquipmentPage'));
+const FurniturePage = lazy(() => import('@/pages/assets/Furniture/FurniturePages'));
+const LicensePage = lazy(() => import('@/pages/company-document/license/LicensePage'));
+const LegalDocumentPage = lazy(() => import('@/pages/company-document/legal-document/LegalDocumentPage'));
+const AduitReportPage = lazy(() => import('@/pages/company-document/aduit-report/AduitReportPage'));
+const ISOCertificationsPage = lazy(() => import('@/pages/company-document/iso-certifications/ISOCertificationsPage'));
 
 export const router = createBrowserRouter([
   {
@@ -37,9 +49,79 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
     children: [
-      {path: '/dashboard', element: <div>Dashboard Content</div> },
+      { path: '/dashboard', element: <div>Dashboard Content</div> },
       {
-        path:'it' , element: <Navigate to="/it/hardware" replace />,
+        path: 'assets', element: <Navigate to="/assets/land-building" replace />,
+      },
+      {
+        path: '/assets/vehicle',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <VehiclePage />
+          </Suspense>
+        )
+      },
+      {
+        path: '/assets/land-building', // becomes /it/software
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <LandBuildingPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/assets/equipment', // becomes /it/software
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <EquipmentPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/assets/furniture', // becomes /it/software
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <FurniturePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/docs/licence', // becomes /it/software
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <LicensePage />
+          </Suspense>
+        ),
+      },
+      {
+        path:'docs', element: <Navigate to="/docs/licence" replace />,
+      },
+      {
+        path: '/docs/legal-docs', // becomes /it/software
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <LegalDocumentPage />
+          </Suspense>
+        ),
+      },
+       {
+        path: '/docs/iso', // becomes /it/software
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <ISOCertificationsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/docs/audit', // becomes /it/software
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <AduitReportPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'it', element: <Navigate to="/it/hardware" replace />,
       },
       {
         path: 'it/hardware', // becomes /it/hardware
@@ -65,7 +147,7 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-       {
+      {
         path: 'it/support', // becomes /it/software
         element: (
           <Suspense fallback={<LoadingFallback />}>
@@ -78,7 +160,7 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingFallback />}>
             {/* <ItSupport /> */}
-            <div>SIM Management Page - Coming Soon</div>
+            <SimPage />
           </Suspense>
         ),
       },
@@ -86,15 +168,17 @@ export const router = createBrowserRouter([
         path: 'it/hardware-transfer', // becomes /it/software
         element: (
           <Suspense fallback={<LoadingFallback />}>
-            <div>Hardware Transfer Page - Coming Soon</div>
+            <HardwareTransferPage />
           </Suspense>
         ),
       },
+
+
     ],
   },
   // optional: keep /dashboard working as redirect to root
-//   {
-//     path: '/dashboard',
-//     element: <Navigate to="/" replace />,
-//   },
+  //   {
+  //     path: '/dashboard',
+  //     element: <Navigate to="/" replace />,
+  //   },
 ]);
