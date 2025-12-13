@@ -87,7 +87,7 @@ export function SidebarMenu() {
           <div className="flex items-center gap-2 min-w-0 text-sm">
             {Icon && <Icon size={16} />}
             {showLabels && (
-              <span className="whitespace-nowrap overflow-hidden text-ellipsis text-sm">
+              <span className="whitespace-nowrap overflow-hidden text-ellipsis text-sm pl-1">
                 {item.label}
               </span>
             )}
@@ -117,7 +117,7 @@ export function SidebarMenu() {
                       ${
                         childIsActive
                           ? 'text-white hover:bg-primary/50 bg-primary/50 '
-                          : 'text-white hover:text-white hover:bg-primary/50 mt-1'
+                          : 'text-white hover:text-white hover:bg-primary/50 mt-1 mb-1'
                       }
                       ${isCollapsed ? 'justify-center' : 'gap-3'}
                     `}
@@ -125,7 +125,7 @@ export function SidebarMenu() {
                     <div className="flex items-center p-2 rounded-lg m-1 transition ml-7">
                       {child.icon && <child.icon size={14} />}
                       {showLabels && (
-                        <span className="whitespace-nowrap overflow-hidden text-ellipsis pl-1">
+                        <span className="whitespace-nowrap overflow-hidden text-ellipsis pl-2">
                           {child.label}
                         </span>
                       )}
