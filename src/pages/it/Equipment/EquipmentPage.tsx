@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import EquipmentTable from "./EquipmentTable";
 import TablePagination from "@/components/ui/tablePagination";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -83,22 +83,24 @@ const EquipmentPage = () => {
   }, [page, rowsPerPage]);
 
   // Map API shape -> table row shape while keeping ids for callbacks
-  const rows = useMemo(
-    () =>
-      items.map((i) => ({
-        id: i.id,
-        name: i.equipmentName,
-        type: i.equipmentType,
-        ip: i.ipAddress,
-        mac: i.macAddress,
-        serial: i.serialNumber,
-        ports: i.numberOfPorts,
-        location: i.location,
-        firmware: i.firmwareVersion,
-        status: i.status,
-      })),
-    [items]
-  );
+  // const rows = useMemo(
+  //   () =>
+  //     items.map((i) => ({
+  //       id: i.id,
+  //       name: i.equipmentName,
+  //       type: i.equipmentType,
+  //       ip: i.ipAddress,
+  //       mac: i.macAddress,
+  //       serial: i.serialNumber,
+  //       ports: i.numberOfPorts,
+  //       location: i.location,
+  //       firmware: i.firmwareVersion,
+  //       status: i.status,
+  //       purchaseDate: i.purchaseDate,
+  //       warrantyExpiry: i.warrantyExpiry,
+  //     })),
+  //   [items]
+  // );
 
   const findById = (id: number | string) =>
     items.find((it) => String(it.id) === String(id)) || null;
@@ -204,7 +206,7 @@ const EquipmentPage = () => {
             <div className="text-sm text-red-600 py-6">{error}</div>
           ) : (
             <EquipmentTable
-              equipment={rows}
+              equipment={items}
               onViewDetails={(row: any) => openViewById(row.id)}
               onEdit={(row: any) => openEditById(row.id)}
               onDelete={(row: any) => requestDeleteById(row.id)}

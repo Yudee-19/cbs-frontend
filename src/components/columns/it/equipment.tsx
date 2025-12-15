@@ -1,5 +1,6 @@
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { ActionButtonWithTooltip } from "@/components/ui/actionButtonWithTooltip";
+import type { NetworkEquipmentData } from "@/services/itServices/NetworkEquipmentServices";
 
 const fmtDate = (iso?: string) =>
   iso ? new Date(iso).toLocaleDateString() : '';
@@ -34,19 +35,19 @@ export const getNetworkEquipmentColumns = (
   onEdit?: (item: any) => void,
   onDelete?: (item: any) => void
 ) => [
-  { key: "name", header: "Equipment Name" },
-  { key: "type", header: "Type" },
-  { key: "ip", header: "IP Address" },
-  { key: "mac", header: "MAC Address" },
-  { key: "serial", header: "Serial Number" },
-  { key: "ports", header: "Ports" },
+  { key: "equipmentName", header: "Equipment Name" },
+  { key: "equipmentType", header: "Type" },
+  { key: "ipAddress", header: "IP Address" },
+  { key: "macAddress", header: "MAC Address" },
+  { key: "serialNumber", header: "Serial Number" },
+  { key: "numberOfPorts", header: "Ports" },
   { key: "location", header: "Location" },
-  { key: "firmware", header: "Firmware" },
+  { key: "firmwareVersion", header: "Firmware" },
   {key:'warrantyExpiry', header: "Warranty Expiry",
-    render: (row: any) => fmtDate(row.warrantyExpiry),
+    render: (row: NetworkEquipmentData) => fmtDate(row.warrantyExpiry),
   },
   {key:'purchaseDate', header: "Purchase Date",
-    render: (row: any) => fmtDate(row.purchaseDate),
+    render: (row: NetworkEquipmentData) => fmtDate(row.purchaseDate),
   },
 
   {

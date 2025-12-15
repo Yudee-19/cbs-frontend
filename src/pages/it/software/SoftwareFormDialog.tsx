@@ -78,12 +78,12 @@ export const SoftwareFormDialog: React.FC<Props> = ({
 
           <div>
             <label className="block text-xs text-muted-foreground mb-1">Purchase Date</label>
-            <input type="date" className="w-full border rounded px-2 py-1" value={form.purchaseDate ? form.purchaseDate.slice(0,10) : ""} onChange={(e) => onChange({ purchaseDate: new Date(e.target.value).toISOString() })} />
+            <input type="date" className="w-full border rounded px-2 py-1" value={form.purchaseDate ? form.purchaseDate : ""} onChange={(e) => onChange({ purchaseDate: new Date(e.target.value).toISOString() })} />
           </div>
 
           <div>
             <label className="block text-xs text-muted-foreground mb-1">Expiry Date</label>
-            <input type="date" className="w-full border rounded px-2 py-1" value={form.expiryDate ? form.expiryDate.slice(0,10) : ""} onChange={(e) => onChange({ expiryDate: new Date(e.target.value).toISOString() })} />
+            <input type="date" className="w-full border rounded px-2 py-1" value={form.expiryDate ? form.expiryDate : ""} onChange={(e) => onChange({ expiryDate: new Date(e.target.value).toISOString() })} />
           </div>
 
           <div>
