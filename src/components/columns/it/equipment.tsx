@@ -1,6 +1,9 @@
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { ActionButtonWithTooltip } from "@/components/ui/actionButtonWithTooltip";
 
+const fmtDate = (iso?: string) =>
+  iso ? new Date(iso).toLocaleDateString() : '';
+
 
 export const getNetworkStatusBadge = (status: string) => {
   let style = "";
@@ -39,6 +42,12 @@ export const getNetworkEquipmentColumns = (
   { key: "ports", header: "Ports" },
   { key: "location", header: "Location" },
   { key: "firmware", header: "Firmware" },
+  {key:'warrantyExpiry', header: "Warranty Expiry",
+    render: (row: any) => fmtDate(row.warrantyExpiry),
+  },
+  {key:'purchaseDate', header: "Purchase Date",
+    render: (row: any) => fmtDate(row.purchaseDate),
+  },
 
   {
     key: "status",

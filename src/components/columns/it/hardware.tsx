@@ -1,5 +1,9 @@
+import type { Hardware } from '@/services/itServices/HardwareServices';
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { ActionButtonWithTooltip } from "../../ui/actionButtonWithTooltip";
+
+const fmtDate = (iso?: string) =>
+  iso ? new Date(iso).toLocaleDateString() : '';
 
 export const getStatusBadge = (status: string) => {
   let colorClass = "";
@@ -36,57 +40,39 @@ export const getStatusBadge = (status: string) => {
   );
 };
 
-
 export const getHardwareTableColumns = (
-  onViewDetails?: (item: any) => void,
-  onEdit?: (item: any) => void,
-  onDelete?: (item: any) => void
+  onViewDetails?: (item: Hardware) => void,
+  onEdit?: (item: Hardware) => void,
+  onDelete?: (item: Hardware) => void
 ) => [
+  { key: "deviceName", header: "Device Name" },
+  { key: "type", header: "Type" },
+  { key: "serialNumber", header: "Serial Number" },
+  { key: "operatingSystem", header: "Operating System" }, // added
+  { key: "processor", header: "Processor" },
+  { key: "ram", header: "RAM" },
+  { key: "storage", header: "Storage" },
   {
-    key: "deviceName",
-    header: "Device Name",
-  },
-  {
-    key: "type",
-    header: "Type",
-  },
-  {
-    key: "serialNumber",
-    header: "Serial Number",
-  },
-  {
-    key: "processor",
-    header: "Processor",
-  },
-  {
-    key: "ram",
-    header: "RAM",
-  },
-  {
-    key: "storage",
-    header: "Storage",
+    key: "purchaseDate",
+    header: "Purchase Date",
+    render: (row: Hardware) => fmtDate(row.purchaseDate), // added + formatted
   },
   {
     key: "warrantyExpiry",
     header: "Warranty Expiry",
+    render: (row: Hardware) => fmtDate(row.warrantyExpiry), // formatted
   },
-  {
-    key: "assignedTo",
-    header: "Assigned To",
-  },
-  {
-    key: "department",
-    header: "Department",
-  },
+  { key: "assignedTo", header: "Assigned To" },
+  { key: "department", header: "Department" },
   {
     key: "status",
     header: "Status",
-    render: (row: any) => getStatusBadge(row.status),
+    render: (row: Hardware) => getStatusBadge(row.status),
   },
   {
     key: "actions",
     header: "Actions",
-    render: (row: any) => (
+    render: (row: Hardware) => (
       <div className="flex space-x-3 cursor-pointer">
         <ActionButtonWithTooltip
           icon={<Eye size={18} />}
