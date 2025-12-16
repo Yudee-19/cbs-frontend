@@ -11,7 +11,7 @@ export const getSimStatusBadge = (status: string) => {
       break;
 
     case "inactive":
-      style = "bg-blue-100 text-blue-600 border border-blue-200";
+      style = "bg-blue-100 text-primary border border-blue-200";
       break;
 
     case "suspended":
@@ -23,7 +23,7 @@ export const getSimStatusBadge = (status: string) => {
   }
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-medium ${style}`}>
+    <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${style}`}>
       {status}
     </span>
   );
@@ -39,10 +39,40 @@ export const getSimTableColumns = (
   { key: "phoneNumber", header: "Phone Number" },
   { key: "carrier", header: "Carrier" },
   { key: "planType", header: "Plan Type" },
-  { key: "monthlyFee", header: "Monthly Fee" },
-  { key: "extraCharges", header: "Extra Charges" },
-  { key: "simCharges", header: "SIM Charges" },
-  { key: "totalCharges", header: "Total Charges" },
+  { key: "monthlyFee", header: "Monthly Fee" ,
+     render: (row: any) => (
+      <div className="flex flex-col leading-tight">
+        <span className="text-black font-medium">{row.monthlyFee}</span>
+        {/* optional second line: show transferType or empty */}
+        <span className="text-xs text-gray-500">(KWD)</span>
+      </div>
+    ),
+  },
+  { key: "extraCharges", header: "Extra Charges" ,
+         render: (row: any) => (
+      <div className="flex flex-col leading-tight">
+        <span className="text-black font-medium">{row.extraCharges}</span>
+        {/* optional second line: show transferType or empty */}
+        <span className="text-xs text-gray-500">(KWD)</span>
+      </div>
+    ),
+  },
+  { key: "simCharges", header: "SIM Charges" , render: (row: any) => (
+      <div className="flex flex-col leading-tight">
+        <span className="text-black font-medium">{row.simCharges}</span>
+        {/* optional second line: show transferType or empty */}
+        <span className="text-xs text-gray-500">(KWD)</span>
+      </div>
+    ),},
+  { key: "totalCharges", header: "Total Charges",
+     render: (row: any) => (
+      <div className="flex flex-col leading-tight">
+        <span className="text-black font-medium">{row.simCharges + row.extraCharges + row.monthlyFee}</span>
+        {/* optional second line: show transferType or empty */}
+        <span className="text-xs text-gray-500">(KWD)</span>
+      </div>
+    ),
+   },
   { key: "dataLimit", header: "Data Limit" },
   { key: "assignedTo", header: "Assigned To" },
   { key: "department", header: "Department" },
@@ -70,14 +100,14 @@ export const getSimTableColumns = (
           icon={<Pencil size={18} />}
           tooltip="Edit SIM"
           onClick={() => onEdit?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-600 rounded-md"
+          colorClass="h-7 w-7 bg-gray-100 text-primary hover:bg-green-50 hover:text-primary rounded-md"
         />
 
         <ActionButtonWithTooltip
           icon={<Trash2 size={18} />}
           tooltip="Delete SIM"
           onClick={() => onDelete?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-md"
+          colorClass="h-7 w-7 bg-gray-100 text-primary hover:bg-red-50 hover:text-primary rounded-md"
         />
       </div>
     ),

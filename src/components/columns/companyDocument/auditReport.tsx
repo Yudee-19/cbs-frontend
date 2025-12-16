@@ -66,13 +66,13 @@ export const getAuditReportColumns = (
           icon={<Eye size={18} />}
           tooltip="View Audit Report"
           onClick={() => onView?.(row)}
-          colorClass="h-7 w-7 p-0 bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded-md"
+          colorClass="h-7 w-7 p-0 bg-gray-100 text-primary hover:bg-blue-50 hover:text-primary rounded-md"
         />
         <ActionButtonWithTooltip
           icon={<Download size={18} />}
           tooltip="Download Report"
           onClick={() => onDownload?.(row)}
-          colorClass="h-7 w-7 p-0 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-md"
+          colorClass="h-7 w-7 p-0 bg-gray-100 text-primary hover:bg-green-50 hover:text-green-600 rounded-md"
         />
       </div>
     ),

@@ -17,7 +17,7 @@ export const getStatusBadge = (status: string) => {
 
     case "under repair":
       colorClass =
-        "bg-blue-100 text-blue-600 border border-blue-200";
+        "bg-blue-100 text-primary border border-blue-200";
       break;
 
     case "inactive":
@@ -33,7 +33,7 @@ export const getStatusBadge = (status: string) => {
 
   return (
     <span
-      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${colorClass}`}
+      className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${colorClass}`}
     >
       {text}
     </span>
@@ -84,13 +84,13 @@ export const getHardwareTableColumns = (
           icon={<Pencil size={18} />}
           tooltip="Edit Asset"
           onClick={() => onEdit?.(row)}
-          colorClass="h-7 w-7 p-0 bg-gray-100 text-gray-500 hover:text-green-600 hover:bg-green-50 transition-colors rounded-md"
+          colorClass="h-7 w-7 p-0 bg-gray-100 text-primary hover:text-primary hover:bg-green-50 transition-colors rounded-md"
         />
         <ActionButtonWithTooltip
           icon={<Trash2 size={18} />}
           tooltip="Delete Asset"
           onClick={() => onDelete?.(row)}
-          colorClass="h-7 w-7 p-0 bg-gray-100 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors rounded-md"
+          colorClass="h-7 w-7 p-0 bg-gray-100 text-primary hover:text-primary hover:bg-red-50 transition-colors rounded-md"
         />
       </div>
     ),

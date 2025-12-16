@@ -12,7 +12,7 @@ export const getStatusBadge = (status: string) => {
       break;
 
     case "expiring soon":
-      colorClass = "bg-yellow-100 text-yellow-700 border border-yellow-300";
+      colorClass = "bg-blue-100 text-primary border border-blue-300";
       break;
 
     case "expired":
@@ -25,7 +25,7 @@ export const getStatusBadge = (status: string) => {
   }
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-medium ${colorClass}`}>
+    <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${colorClass}`}>
       {text}
     </span>
   );
@@ -76,13 +76,13 @@ export const getSoftwareTableColumns = (
           icon={<Pencil size={18} />}
           tooltip="Edit"
           onClick={() => onEdit?.(row)}
-          colorClass="h-7 w-7 p-0 bg-gray-100 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-md"
+          colorClass="h-7 w-7 p-0 bg-gray-100 text-primary hover:text-primary hover:bg-green-50 rounded-md"
         />
         <ActionButtonWithTooltip
           icon={<Trash2 size={18} />}
           tooltip="Delete"
           onClick={() => onDelete?.(row)}
-          colorClass="h-7 w-7 p-0 bg-gray-100 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md"
+          colorClass="h-7 w-7 p-0 bg-gray-100 text-primary hover:text-primary hover:bg-red-50 rounded-md"
         />
       </div>
     ),

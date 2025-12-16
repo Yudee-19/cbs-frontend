@@ -61,18 +61,18 @@ const ItSupportPage = () => {
 
   const [form, setForm] = useState<SupportTicketData>(emptyForm);
 
-  const fetchData = async (showToast = false) => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const { items: fetched, total: totalCount } = await listSupportTickets(page, rowsPerPage);
       setItems(Array.isArray(fetched) ? fetched : []);
       setTotal(Number(totalCount) || (Array.isArray(fetched) ? fetched.length : 0));
       setError(null);
-      if (showToast) {
-        toast.success("Support list refreshed", {
-          description: `Loaded ${fetched?.length ?? 0} item${(fetched?.length ?? 0) === 1 ? "" : "s"}.`,
-        });
-      }
+      // if (showToast) {
+      //   toast.success("Support list refreshed", {
+      //     description: `Loaded ${fetched?.length ?? 0} item${(fetched?.length ?? 0) === 1 ? "" : "s"}.`,
+      //   });
+      // }
     } catch (e: any) {
       setError(e?.message || "Failed to load tickets.");
       toast.error("Failed to load tickets", { description: e?.message ?? "Unexpected error" });
@@ -84,7 +84,7 @@ const ItSupportPage = () => {
   };
 
   useEffect(() => {
-    fetchData(false);
+    fetchData();
   }, [page, rowsPerPage]);
 
   const openAdd = () => {
@@ -120,7 +120,7 @@ const ItSupportPage = () => {
       toast.success("Ticket deleted", { description: itemToDelete.ticketTitle });
       setDeleteDialogOpen(false);
       setItemToDelete(null);
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
     } finally {
@@ -140,7 +140,7 @@ const ItSupportPage = () => {
         await updateSupportTicket(current.id, form);
         toast.success("Ticket updated", { description: form.ticketTitle });
       }
-      await fetchData(true);
+      await fetchData();
       setEditDialogOpen(false);
     } catch (e: any) {
       toast.error(mode === "add" ? "Create failed" : "Update failed", {

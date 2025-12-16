@@ -62,18 +62,13 @@ const EquipmentPage = () => {
 
   const [form, setForm] = useState<NetworkEquipmentData>(emptyForm);
 
-  const fetchData = async (showToast = false) => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const { total: totalCount, items } = await listNetworkEquipment(page, rowsPerPage);
       setItems(Array.isArray(items) ? items : []);
       setTotal(Number(totalCount) || 0);
       setError(null);
-      if (showToast) {
-        toast.success("Network equipment list refreshed", {
-          description: `Loaded ${items.length} item${items.length === 1 ? "" : "s"}.`,
-        });
-      }
     } catch (e: any) {
       setError(e?.message || "Failed to load equipment.");
       toast.error("Failed to load equipment", { description: e?.message ?? "Unexpected error" });
@@ -85,7 +80,7 @@ const EquipmentPage = () => {
   };
 
   useEffect(() => {
-    fetchData(false);
+    fetchData();
   }, [page, rowsPerPage]);
 
   const findById = (id: number | string) =>
@@ -143,7 +138,7 @@ const EquipmentPage = () => {
       setDeleteDialogOpen(false);
       toast.success("Equipment deleted", { description: itemToDelete.equipmentName });
       setItemToDelete(null);
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
     } finally {
@@ -179,7 +174,7 @@ const EquipmentPage = () => {
         });
         toast.success("Equipment updated", { description: form.equipmentName });
       }
-      await fetchData(true);
+      await fetchData();
       setEditDialogOpen(false);
     } catch (e: any) {
       toast.error(mode === "add" ? "Create failed" : "Update failed", {

@@ -35,7 +35,7 @@ const PRIORITY_OPTIONS = ["Low", "Medium", "High", "Critical"] as const;
 const DEPT_OPTIONS = ["Finance", "HR", "Operations", "Sales", "Marketing", "IT", "Legal"] as const;
 
 const ASSIGNEE_OPTIONS = ["Unassigned", "Mark Wilson", "James Chen", "Sarah Mitchell"] as const;
-
+const STATUS_OPTIONS = ["Open", "InProgress", "Resolved"] as const;
 type Mode = "add" | "edit";
 
 interface Props {
@@ -161,8 +161,28 @@ const ItSupportFormDialog: React.FC<Props> = ({
               </SelectContent>
             </Select>
           </div>
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1">Status</label>
+            <Select
+              value={form.status ? String(form.status) : "__none"}
+              onValueChange={(v) => onChange({ status: v === "__none" ? "" : v })}
+              disabled={submitting}
+            >
+              <SelectTrigger size="sm">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem key="__none_status" value="__none">None</SelectItem>
+                {STATUS_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+         </div>
 
-          <div className="col-span-2">
+          <div >
             <label className="block text-xs text-muted-foreground mb-1">Submitted By</label>
             <input className="w-full border rounded px-2 py-1" value={form.submittedBy || ""} onChange={(e) => onChange({ submittedBy: e.target.value })} disabled={submitting} />
           </div>

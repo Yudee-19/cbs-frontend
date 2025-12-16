@@ -49,10 +49,10 @@ const SimPage = () => {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    fetchData(false);
+    fetchData();
   }, [page, rowsPerPage, filter]);
 
-  const fetchData = async (showToast = false) => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const { items: sims, total: totalCount } = await listSims(page, rowsPerPage);
@@ -60,7 +60,7 @@ const SimPage = () => {
       setItems(filtered);
       setTotal(totalCount);
       setError(null);
-      if (showToast) toast.success("SIMs refreshed", { description: `Loaded ${filtered.length} item${filtered.length === 1 ? "" : "s"}.` });
+      // if (showToast) toast.success("SIMs refreshed", { description: `Loaded ${filtered.length} item${filtered.length === 1 ? "" : "s"}.` });
     } catch (e: any) {
       setError(e?.message ?? "Failed to load sims");
       toast.error("Failed to load sims", { description: e?.message ?? "Unexpected error" });
@@ -103,7 +103,7 @@ const SimPage = () => {
       toast.success("SIM deleted", { description: itemToDelete.simNumber });
       setDeleteDialogOpen(false);
       setItemToDelete(null);
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
     } finally {
@@ -124,7 +124,7 @@ const SimPage = () => {
         toast.success("SIM updated", { description: form?.simNumber });
       }
       setFormOpen(false);
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error(mode === "add" ? "Create failed" : "Update failed", { description: e?.message ?? "Unexpected error" });
       throw e;

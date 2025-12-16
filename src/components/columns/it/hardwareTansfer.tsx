@@ -22,7 +22,7 @@ export const getTransferStatusBadge = (status: string) => {
   }
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-medium ${cls}`}>
+    <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${cls}`}>
       {status}
     </span>
   );
@@ -45,7 +45,7 @@ export const getHardwareTransferColumns = (
     header: "Hardware",
     render: (row: any) => (
       <div className="flex flex-col leading-tight">
-        <span className="font-medium">{row.hardwareName ?? row.hardware ?? ""}</span>
+        <span className="text-black font-medium">{row.hardwareName ?? row.hardware ?? ""}</span>
         {/* optional second line: show transferType or empty */}
         <span className="text-xs text-gray-500">{row.transferType ?? ""}</span>
       </div>
@@ -66,7 +66,7 @@ export const getHardwareTransferColumns = (
       const [name, dept] = String(from).split(" - ").map((s) => s?.trim());
       return (
         <div className="flex flex-col">
-          <span>{name ?? from}</span>
+          <span className="text-black font-medium">{name ?? from}</span>
           <span className="text-xs text-gray-500">{dept ?? row.fromDept ?? ""}</span>
         </div>
       );
@@ -81,7 +81,7 @@ export const getHardwareTransferColumns = (
       const [name, dept] = String(to).split(" - ").map((s) => s?.trim());
       return (
         <div className="flex flex-col">
-          <span>{name ?? to}</span>
+          <span className="text-black font-medium">{name ?? to}</span>
           <span className="text-xs text-gray-500">{dept ?? row.toDept ?? ""}</span>
         </div>
       );
@@ -138,14 +138,14 @@ export const getHardwareTransferColumns = (
           icon={<Pencil size={18} />}
           tooltip="Edit"
           onClick={() => onEdit?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-md"
+          colorClass="h-7 w-7 bg-gray-100 hover:bg-green-50 hover:text-primary rounded-md text-primary"
         />
 
         <ActionButtonWithTooltip
           icon={<Trash2 size={18} />}
           tooltip="Delete"
           onClick={() => onDelete?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-red-50 hover:text-red-600 rounded-md"
+          colorClass="h-7 w-7 bg-gray-100 hover:bg-red-50 hover:text-primary rounded-md text-primary"
         />
       </div>
     ),
