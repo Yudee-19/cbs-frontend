@@ -17,6 +17,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
+import { toast } from "sonner"; // ...added
 
 const SoftwarePage = () => {
   const [softwareList, setSoftwareList] = useState<Service.SoftwareLicenseData[]>([]);
@@ -44,10 +45,13 @@ const SoftwarePage = () => {
       const { items, total } = await Service.listSoftware(page, rowsPerPage);
       setSoftwareList(Array.isArray(items) ? items : []);
       setTotal(Number(total) || 0);
-    } catch (e) {
+      // success toast optional on manual refresh; uncomment if desired
+      // toast.success("Software list loaded", { description: `Loaded ${items.length} items.` });
+    } catch (e: any) {
       console.error(e);
       setSoftwareList([]);
       setTotal(0);
+      toast.error("Failed to load software", { description: e?.message ?? "Unexpected error" }); // ...added
     } finally {
       setLoading(false); // add
     }
@@ -87,12 +91,14 @@ const SoftwarePage = () => {
     try {
       setDeleting(true);
       await Service.deleteSoftware(itemToDelete.id);
+      toast.success("Software deleted", { description: itemToDelete.name }); // ...added
       await load();
       setDeleteDialogOpen(false);
       setItemToDelete(null);
       setFormOpen(false); // close form if deletion triggered from edit dialog
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      toast.error("Delete failed", { description: e?.message ?? "Unexpected error" }); // ...added
     } finally {
       setDeleting(false);
     }
@@ -110,6 +116,7 @@ const SoftwarePage = () => {
     // Expiry must be after purchase
     if (pd && ed && ed.getTime() <= pd.getTime()) {
       console.error("Expiry date must be after purchase date");
+      toast.error("Expiry date must be after purchase date"); // ...added
       setSubmitting(false);
       return;
     }
@@ -117,6 +124,7 @@ const SoftwarePage = () => {
     // Seats used cannot exceed total seats
     if (totalSeats > 0 && seatsUsed > totalSeats) {
       console.error("Seats used cannot exceed total seats");
+      toast.error("Seats used cannot exceed total seats"); // ...added
       setSubmitting(false);
       return;
     }
@@ -124,12 +132,18 @@ const SoftwarePage = () => {
     try {
       if (formMode === "add") {
         await Service.createSoftware(formData);
+        toast.success("Software created", { description: formData.name }); // ...added
       } else if (formMode === "edit" && formData.id) {
         await Service.updateSoftware(formData.id, formData);
+        toast.success("Software updated", { description: formData.name }); // ...added
       }
       await load();
-    } catch (e) {
+      setFormOpen(false);
+    } catch (e: any) {
       console.error(e);
+      toast.error(formMode === "add" ? "Create failed" : "Update failed", {
+        description: e?.message ?? "Unexpected error",
+      }); // ...added
     } finally {
       setSubmitting(false);
     }

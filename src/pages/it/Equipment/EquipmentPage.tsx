@@ -5,6 +5,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import ShimmerTable from "@/components/ui/shimmerTable";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -61,16 +62,21 @@ const EquipmentPage = () => {
 
   const [form, setForm] = useState<NetworkEquipmentData>(emptyForm);
 
-  const fetchData = async () => {
+  const fetchData = async (showToast = false) => {
     try {
       setLoading(true);
       const { total: totalCount, items } = await listNetworkEquipment(page, rowsPerPage);
-      console.log('Fetched items:', items);
       setItems(Array.isArray(items) ? items : []);
       setTotal(Number(totalCount) || 0);
       setError(null);
+      if (showToast) {
+        toast.success("Network equipment list refreshed", {
+          description: `Loaded ${items.length} item${items.length === 1 ? "" : "s"}.`,
+        });
+      }
     } catch (e: any) {
       setError(e?.message || "Failed to load equipment.");
+      toast.error("Failed to load equipment", { description: e?.message ?? "Unexpected error" });
       setItems([]);
       setTotal(0);
     } finally {
@@ -79,28 +85,8 @@ const EquipmentPage = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(false);
   }, [page, rowsPerPage]);
-
-  // Map API shape -> table row shape while keeping ids for callbacks
-  // const rows = useMemo(
-  //   () =>
-  //     items.map((i) => ({
-  //       id: i.id,
-  //       name: i.equipmentName,
-  //       type: i.equipmentType,
-  //       ip: i.ipAddress,
-  //       mac: i.macAddress,
-  //       serial: i.serialNumber,
-  //       ports: i.numberOfPorts,
-  //       location: i.location,
-  //       firmware: i.firmwareVersion,
-  //       status: i.status,
-  //       purchaseDate: i.purchaseDate,
-  //       warrantyExpiry: i.warrantyExpiry,
-  //     })),
-  //   [items]
-  // );
 
   const findById = (id: number | string) =>
     items.find((it) => String(it.id) === String(id)) || null;
@@ -155,10 +141,11 @@ const EquipmentPage = () => {
       setDeleting(true);
       await deleteNetworkEquipment(itemToDelete.id);
       setDeleteDialogOpen(false);
+      toast.success("Equipment deleted", { description: itemToDelete.equipmentName });
       setItemToDelete(null);
-      await fetchData();
-    } catch (e) {
-      // noop
+      await fetchData(true);
+    } catch (e: any) {
+      toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
     } finally {
       setDeleting(false);
     }
@@ -167,15 +154,38 @@ const EquipmentPage = () => {
   const onFormChange = (patch: Partial<NetworkEquipmentData>) =>
     setForm((prev) => ({ ...prev, ...patch }));
 
+  const toISODate = (v?: string) => {
+    if (!v) return undefined;
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return new Date().toISOString();
+    return d.toISOString();
+  };
+
   const handleFormSubmit = async () => {
     setSubmitting(true);
     try {
       if (mode === "add") {
-        await createNetworkEquipment(form);
+        await createNetworkEquipment({
+          ...form,
+          purchaseDate: toISODate(form.purchaseDate),
+          warrantyExpiry: toISODate(form.warrantyExpiry),
+        });
+        toast.success("Equipment created", { description: form.equipmentName });
       } else if (mode === "edit" && current?.id) {
-        await updateNetworkEquipment(current.id, form);
+        await updateNetworkEquipment(current.id, {
+          ...form,
+          purchaseDate: toISODate(form.purchaseDate),
+          warrantyExpiry: toISODate(form.warrantyExpiry),
+        });
+        toast.success("Equipment updated", { description: form.equipmentName });
       }
-      await fetchData();
+      await fetchData(true);
+      setEditDialogOpen(false);
+    } catch (e: any) {
+      toast.error(mode === "add" ? "Create failed" : "Update failed", {
+        description: e?.message ?? "Unexpected error",
+      });
+      throw e;
     } finally {
       setSubmitting(false);
     }

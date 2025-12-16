@@ -59,12 +59,12 @@ export const getSimTableColumns = (
     header: "Actions",
     render: (row: any) => (
       <div className="flex space-x-3 cursor-pointer">
-        <ActionButtonWithTooltip
+        { false && <ActionButtonWithTooltip
           icon={<Eye size={18} />}
           tooltip="View SIM"
           onClick={() => onView?.(row)}
           colorClass="h-7 w-7 bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600 rounded-md"
-        />
+        />}
 
         <ActionButtonWithTooltip
           icon={<Pencil size={18} />}

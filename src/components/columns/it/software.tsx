@@ -66,12 +66,12 @@ export const getSoftwareTableColumns = (
     header: "Actions",
     render: (row: any) => (
       <div className="flex space-x-3 cursor-pointer">
-        <ActionButtonWithTooltip
+        { false && <ActionButtonWithTooltip
           icon={<Eye size={18} />}
           tooltip="View Details"
           onClick={() => onViewDetails?.(row)}
           colorClass="h-7 w-7 p-0 bg-gray-100 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-md"
-        />
+        />}
         <ActionButtonWithTooltip
           icon={<Pencil size={18} />}
           tooltip="Edit"

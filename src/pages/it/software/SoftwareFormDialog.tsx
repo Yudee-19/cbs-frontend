@@ -11,6 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import type { SoftwareLicenseData } from "@/services/itServices/SoftwareLicenseServices";
 import { Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Mode = "add" | "edit";
 
@@ -26,6 +33,8 @@ interface Props {
 }
 
 const STATUS_OPTIONS = ["Active", "Expiring Soon", "Expired"] as const;
+const LICENSE_TYPE_OPTIONS = ["Subscription", "Perpetual", "Trial", "Educational"] as const;
+const ASSIGNED_DEPT_OPTIONS = ["All", "IT", "Finance", "HR", "Operations", "Sales", "Marketing", "Engineering", "Legal"] as const;
 
 export const SoftwareFormDialog: React.FC<Props> = ({
   open,
@@ -58,8 +67,21 @@ export const SoftwareFormDialog: React.FC<Props> = ({
 
           <div>
             <label className="block text-xs text-muted-foreground mb-1">License Type</label>
-            <input className="w-full border rounded px-2 py-1" value={form.licenseType || ""} onChange={(e) => onChange({ licenseType: e.target.value })} />
-          </div>
+            <Select
+              value={form.licenseType ? String(form.licenseType) : "__none"}
+               onValueChange={(v) => onChange({ licenseType: v === "__none" ? "" : v })}
+             >
+               <SelectTrigger size="sm">
+                 <SelectValue placeholder="Select" />
+               </SelectTrigger>
+               <SelectContent>
+                 <SelectItem key="__none_license" value="__none">None</SelectItem>
+                 {LICENSE_TYPE_OPTIONS.map((s) => (
+                   <SelectItem key={s} value={s}>{s}</SelectItem>
+                 ))}
+               </SelectContent>
+             </Select>
+           </div>
 
           <div>
             <label className="block text-xs text-muted-foreground mb-1">License Key</label>
@@ -78,12 +100,15 @@ export const SoftwareFormDialog: React.FC<Props> = ({
 
           <div>
             <label className="block text-xs text-muted-foreground mb-1">Purchase Date</label>
-            <input type="date" className="w-full border rounded px-2 py-1" value={form.purchaseDate ? form.purchaseDate : ""} onChange={(e) => onChange({ purchaseDate: new Date(e.target.value).toISOString() })} />
+            <input type="date" className="w-full border rounded px-2 py-1" value={form.purchaseDate ? form.purchaseDate.slice(0, 10) : ""}
+              onChange={(e) =>
+                onChange({ purchaseDate: new Date(e.target.value).toISOString() })
+              } />
           </div>
 
           <div>
             <label className="block text-xs text-muted-foreground mb-1">Expiry Date</label>
-            <input type="date" className="w-full border rounded px-2 py-1" value={form.expiryDate ? form.expiryDate : ""} onChange={(e) => onChange({ expiryDate: new Date(e.target.value).toISOString() })} />
+            <input type="date" className="w-full border rounded px-2 py-1" value={form.expiryDate ? form.expiryDate.slice(0, 10) : ""} onChange={(e) => onChange({ expiryDate: new Date(e.target.value).toISOString() })} />
           </div>
 
           <div>
@@ -93,7 +118,20 @@ export const SoftwareFormDialog: React.FC<Props> = ({
 
           <div>
             <label className="block text-xs text-muted-foreground mb-1">Assigned Department</label>
-            <input className="w-full border rounded px-2 py-1" value={form.assignedDepartment || ""} onChange={(e) => onChange({ assignedDepartment: e.target.value })} />
+            <Select
+              value={form.assignedDepartment ? String(form.assignedDepartment) : "__none"}
+              onValueChange={(v) => onChange({ assignedDepartment: v === "__none" ? "" : v })}
+            >
+              <SelectTrigger size="sm">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem key="__none_dept" value="__none">None</SelectItem>
+                {ASSIGNED_DEPT_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

@@ -1,23 +1,20 @@
-import axios,  {type AxiosResponse } from "axios";
+import axios,  { type AxiosResponse } from "axios";
 
-export type SoftwareLicenseData = {
+export type SupportTicketData = {
   id?: number | string;
-  name: string;
-  vendor?: string;
-  licenseType?: string;
-  licenseKey?: string;
-  totalSeats?: number;
-  seatsUsed?: number;
-  purchaseDate?: string;
-  expiryDate?: string;
-  renewalCost?: string;
-  assignedDepartment?: string;
-  status?: string;
   createdAt?: string;
   updatedAt?: string;
+  ticketTitle: string;
+  category?: string;
+  priority?: string;
+  department?: string;
+  assignTo?: string;
+  description?: string;
+  submittedBy?: string;
+  status?: string;
 };
 
-const API_BASE = "https://company-documnets.onrender.com/api/software";
+const API_BASE = "https://company-documnets.onrender.com/api/support";
 
 async function handleAxios<T>(p: Promise<AxiosResponse<T>>): Promise<T> {
   try {
@@ -35,14 +32,17 @@ async function handleAxios<T>(p: Promise<AxiosResponse<T>>): Promise<T> {
 }
 
 // Normalize to { items, total }
-export async function listSoftware(page = 1, perPage = 25): Promise<{ items: SoftwareLicenseData[]; total: number; }> {
+export async function listSupportTickets(
+  page = 1,
+  perPage = 25
+): Promise<{ items: SupportTicketData[]; total: number }> {
   const res = await handleAxios<any>(
     axios.get(API_BASE, { params: { page, limit: perPage } })
   );
   const json = res;
 
-  const items: SoftwareLicenseData[] =
-    json?.data?.softwares ??
+  const items: SupportTicketData[] =
+    json?.data?.tickets ??
     [];
 
   const total: number = Number(
@@ -52,23 +52,26 @@ export async function listSoftware(page = 1, perPage = 25): Promise<{ items: Sof
   return { items, total };
 }
 
-export async function getSoftware(id: number | string) {
-  return handleAxios<SoftwareLicenseData>(axios.get(`${API_BASE}/${id}`));
+export async function getSupportTicket(id: number | string) {
+  return handleAxios<SupportTicketData>(axios.get(`${API_BASE}/${id}`));
 }
 
-export async function createSoftware(data: SoftwareLicenseData) {
-  return handleAxios<SoftwareLicenseData>(
+export async function createSupportTicket(data: SupportTicketData) {
+  return handleAxios<SupportTicketData>(
     axios.post(API_BASE, data, { headers: { "Content-Type": "application/json" } })
   );
 }
 
-export async function updateSoftware(id: number | string, data: Partial<SoftwareLicenseData>) {
-  return handleAxios<SoftwareLicenseData>(
+export async function updateSupportTicket(
+  id: number | string,
+  data: Partial<SupportTicketData>
+) {
+  return handleAxios<SupportTicketData>(
     axios.put(`${API_BASE}/${id}`, data, { headers: { "Content-Type": "application/json" } })
   );
 }
 
-export async function deleteSoftware(id: number | string) {
+export async function deleteSupportTicket(id: number | string) {
   await handleAxios(axios.delete(`${API_BASE}/${id}`));
   return true;
 }

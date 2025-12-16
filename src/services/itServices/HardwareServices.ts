@@ -1,5 +1,4 @@
-// import {API_URLS} from '@/constants/url-constants';
-// import axios from 'axios';
+import axios,  { type AxiosResponse } from 'axios';
 
 export interface HardwareData {
   deviceName: string;
@@ -26,9 +25,19 @@ export interface Hardware extends HardwareData {
 
 const API_BASE = "https://company-documnets.onrender.com/api/new-hardware";
 
-async function handleResponse<T = any>(res: Response): Promise<T> {
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+async function handleAxios<T>(p: Promise<AxiosResponse<T>>): Promise<T> {
+  try {
+    const res = await p;
+    return res.data;
+  } catch (err: any) {
+    const msg =
+      err?.response?.data
+        ? typeof err.response.data === 'string'
+          ? err.response.data
+          : JSON.stringify(err.response.data)
+        : err?.message ?? String(err);
+    throw new Error(msg);
+  }
 }
 
 // Normalized list -> { items, total }
@@ -36,16 +45,13 @@ export async function listHardware(
   page = 1,
   perPage = 25
 ): Promise<{ items: Hardware[]; total: number }> {
-  const url = `${API_BASE}?page=${page}&limit=${perPage}`;
-  const json = await handleResponse<any>(await fetch(url));
+  const res = await handleAxios<any>(
+    axios.get(API_BASE, { params: { page, limit: perPage } })
+  );
+  const json = res;
 
   const items: Hardware[] =
-    json?.data?.newHardwares ?? // backend shape per your sample
-    json?.data?.hardwares ??
-    json?.data?.hardware ??
-    json?.data?.items ??
-    json?.items ??
-    (Array.isArray(json?.data) ? json.data : []) ??
+    json?.data?.newHardwares ??
     [];
 
   const total: number = Number(
@@ -60,31 +66,23 @@ export async function listHardware(
 }
 
 export async function getHardware(id: string) {
-  const res = await fetch(`${API_BASE}/${id}`);
-  return handleResponse<Hardware>(res);
+  return handleAxios<Hardware>(axios.get(`${API_BASE}/${id}`));
 }
 
 export async function createHardware(payload: HardwareData) {
-  const res = await fetch(API_BASE, {
-    method: "POST",
+  return handleAxios<Hardware>(axios.post(API_BASE, payload, {
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  return handleResponse<Hardware>(res);
+  }));
 }
 
 export async function updateHardware(id: string, payload: Partial<HardwareData>) {
-  const res = await fetch(`${API_BASE}/${id}`, {
-    method: "PUT",
+  return handleAxios<Hardware>(axios.put(`${API_BASE}/${id}`, payload, {
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  return handleResponse<Hardware>(res);
+  }));
 }
 
 export async function deleteHardware(id: string) {
-  const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error(await res.text());
+  await handleAxios(axios.delete(`${API_BASE}/${id}`));
   return true;
 }
 
