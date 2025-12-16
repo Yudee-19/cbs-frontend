@@ -56,6 +56,7 @@ const USER_OPTIONS = [
 
 const TRANSFER_TYPE_OPTIONS = ['Temporary', 'Permanent', 'Loan'] as const;
 const CONDITION_OPTIONS = ['Excellent', 'Good', 'Fair', 'Poor'] as const;
+const STATUS_OPTIONS = ['Active', 'Returned', 'Permanent Transfer', 'Pending'] as const;
 
 export const HardwareTransferFormDialog: React.FC<Props> = ({ open, mode, form, onChange, onSubmit, onClose, onDelete, submitting = false }) => {
   return (
@@ -194,6 +195,27 @@ export const HardwareTransferFormDialog: React.FC<Props> = ({ open, mode, form, 
                 {CONDITION_OPTIONS.map((c) => (
                   <SelectItem key={c} value={c}>
                     {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1">Status</label>
+            <Select
+              value={form.status ? String(form.status) : "__none"}
+              onValueChange={(v) => onChange({ status: v === "__none" ? "" : v })}
+              disabled={submitting}
+            >
+              <SelectTrigger size="sm">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none">None</SelectItem>
+                {STATUS_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
                   </SelectItem>
                 ))}
               </SelectContent>

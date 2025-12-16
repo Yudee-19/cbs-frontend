@@ -65,7 +65,7 @@ const HardwareTransferPage = () => {
   const [itemToDelete, setItemToDelete] = useState<HardwareTransferData | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const fetchData = async (showToast = false) => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const { items: transfers, total: totalCount } = await listHardwareTransfers(page, rowsPerPage);
@@ -73,7 +73,7 @@ const HardwareTransferPage = () => {
       setItems(filtered);
       setTotal(totalCount);
       setError(null);
-      if (showToast) toast.success("Transfers refreshed", { description: `Loaded ${filtered.length}` });
+      // if (showToast) toast.success("Transfers refreshed", { description: `Loaded ${filtered.length}` });
     } catch (e: any) {
       setError(e?.message ?? "Failed to load transfers");
       toast.error("Failed to load transfers", { description: e?.message ?? "Unexpected error" });
@@ -83,7 +83,7 @@ const HardwareTransferPage = () => {
   };
 
   useEffect(() => {
-    fetchData(false);
+    fetchData();
   }, [page, rowsPerPage, filter]);
 
   const openAdd = () => {
@@ -118,7 +118,7 @@ const HardwareTransferPage = () => {
       toast.success("Transfer deleted", { description: itemToDelete.transferReason ?? String(itemToDelete.id) });
       setDeleteDialogOpen(false);
       setItemToDelete(null);
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
     } finally {
@@ -139,7 +139,7 @@ const HardwareTransferPage = () => {
         toast.success("Transfer updated", { description: (form as any).transferId ?? "" });
       }
       setFormOpen(false);
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error(mode === "add" ? "Create failed" : "Update failed", { description: e?.message ?? "Unexpected error" });
       throw e;
