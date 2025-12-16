@@ -54,6 +54,12 @@ export const router = createBrowserRouter([
         path: 'assets', element: <Navigate to="/assets/land-building" replace />,
       },
       {
+        path : '/my-attendance', element: <div>My Attendance Page</div>
+      },
+      {
+        path : '/leave-application', element: <div>Leave Application Page</div>
+      },
+      {
         path: '/assets/vehicle',
         element: (
           <Suspense fallback={<LoadingFallback />}>

@@ -1,17 +1,9 @@
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import SimTable from "./SimTable";
 import TablePagination from "@/components/ui/tablePagination";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Ban,
-  Calendar,
-  Plus,
-  UserMinus,
-  Users,
-  Upload,
-  Download,
-} from "lucide-react";
+import { Ban, Calendar, Plus, UserMinus, Users, Upload, Download, Loader2 } from "lucide-react";
 import StatCard from "@/components/ui/statCard";
 import {
   Select,
@@ -21,183 +13,142 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
+import {
+  listSims,
+  createSim,
+  updateSim,
+  deleteSim,
+  type SimData,
+} from "@/services/itServices/SimServices";
+import { SimFormDialog } from "./SimFormDialog";
+import { SimDetailsDrawer } from "./SimDetailsDrawer";
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import ShimmerTable from "@/components/ui/shimmerTable";
+import { toast } from "sonner";
+
 const SimPage = () => {
- const dummySimCards = [
-  {
-    id: 1,
-    simNumber: "SIM-89965-2024-001",
-    phoneNumber: "+965 9876 5432",
-    carrier: "Zain Kuwait",
-    planType: "Business Unlimited",
-    monthlyFee: "25,000 (KWD)",
-    extraCharges: "5,000 (KWD)",
-    simCharges: "40,000 (KWD)",
-    totalCharges: "Unlimited",
-    dataLimit: "Unlimited",
-    assignedTo: "John Smith",
-    department: "Sales",
-    expiryDate: "2025-01-15",
-    status: "Active",
-  },
-  {
-    id: 2,
-    simNumber: "SIM-89965-2024-002",
-    phoneNumber: "+965 9876 5433",
-    carrier: "Ooredoo Kuwait",
-    planType: "Business Premium",
-    monthlyFee: "30,000 (KWD)",
-    extraCharges: "5,000 (KWD)",
-    simCharges: "50,000 (KWD)",
-    totalCharges: "100GB",
-    dataLimit: "100GB",
-    assignedTo: "Sarah Johnson",
-    department: "Marketing",
-    expiryDate: "2025-02-10",
-    status: "Inactive",
-  },
-  {
-    id: 3,
-    simNumber: "SIM-89965-2023-045",
-    phoneNumber: "+965 9876 5434",
-    carrier: "STC Kuwait",
-    planType: "Standard",
-    monthlyFee: "15,000 (KWD)",
-    extraCharges: "5,000 (KWD)",
-    simCharges: "20,000 (KWD)",
-    totalCharges: "50GB",
-    dataLimit: "50GB",
-    assignedTo: "Unassigned",
-    department: "IT",
-    expiryDate: "2024-06-20",
-    status: "Active",
-  },
-  {
-    id: 4,
-    simNumber: "SIM-89965-2024-003",
-    phoneNumber: "+965 9876 5435",
-    carrier: "Zain Kuwait",
-    planType: "Business Basic",
-    monthlyFee: "20,000 (KWD)",
-    extraCharges: "5,000 (KWD)",
-    simCharges: "30,000 (KWD)",
-    totalCharges: "75GB",
-    dataLimit: "75GB",
-    assignedTo: "Michael Brown",
-    department: "Operations",
-    expiryDate: "2025-03-01",
-    status: "Active",
-  },
-  {
-    id: 5,
-    simNumber: "SIM-89965-2023-089",
-    phoneNumber: "+965 9876 5436",
-    carrier: "Ooredoo Kuwait",
-    planType: "Business Unlimited",
-    monthlyFee: "25,000 (KWD)",
-    extraCharges: "5,000 (KWD)",
-    simCharges: "30,000 (KWD)",
-    totalCharges: "Unlimited",
-    dataLimit: "Unlimited",
-    assignedTo: "Ahmed Al-Rashid",
-    department: "Finance",
-    expiryDate: "2024-11-15",
-    status: "Suspended",
-  },
-
-  // Repeat set like screenshot
-  {
-    id: 6,
-    simNumber: "SIM-89965-2024-001",
-    phoneNumber: "+965 9876 5432",
-    carrier: "Zain Kuwait",
-    planType: "Business Unlimited",
-    monthlyFee: "25,000 (KWD)",
-    extraCharges: "5,000 (KWD)",
-    simCharges: "40,000 (KWD)",
-    totalCharges: "Unlimited",
-    dataLimit: "Unlimited",
-    assignedTo: "John Smith",
-    department: "Sales",
-    expiryDate: "2025-01-15",
-    status: "Active",
-  },
-  {
-    id: 7,
-    simNumber: "SIM-89965-2024-002",
-    phoneNumber: "+965 9876 5433",
-    carrier: "Ooredoo Kuwait",
-    planType: "Business Premium",
-    monthlyFee: "30,000 (KWD)",
-    extraCharges: "5,000 (KWD)",
-    simCharges: "50,000 (KWD)",
-    totalCharges: "100GB",
-    dataLimit: "100GB",
-    assignedTo: "Sarah Johnson",
-    department: "Marketing",
-    expiryDate: "2025-02-10",
-    status: "Inactive",
-  },
-  {
-    id: 8,
-    simNumber: "SIM-89965-2023-045",
-    phoneNumber: "+965 9876 5434",
-    carrier: "STC Kuwait",
-    planType: "Standard",
-    monthlyFee: "15,000 (KWD)",
-    extraCharges: "5,000 (KWD)",
-    simCharges: "20,000 (KWD)",
-    totalCharges: "50GB",
-    dataLimit: "50GB",
-    assignedTo: "Unassigned",
-    department: "IT",
-    expiryDate: "2024-06-20",
-    status: "Active",
-  },
-];
-
+  const [items, setItems] = useState<SimData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [total, setTotal] = useState<number>(0);
+
   const [filter, setFilter] = useState<string>("all");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const filteredSimCards = useMemo(() => {
-    if (filter === "all") return dummySimCards;
-    return dummySimCards.filter(
-      (s) => s.status?.toLowerCase() === filter.toLowerCase()
-    );
-  }, [filter, dummySimCards]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [mode, setMode] = useState<"add" | "edit">("add");
+  const [current, setCurrent] = useState<SimData | null>(null);
+  const [form, setForm] = useState<Partial<SimData>>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  const total = filteredSimCards.length;
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<SimData | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const paginatedSimCards = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    return filteredSimCards.slice(start, start + rowsPerPage);
-  }, [page, rowsPerPage, filteredSimCards]);
+  useEffect(() => {
+    fetchData();
+  }, [page, rowsPerPage, filter]);
 
-  const onImportClick = () => {
-    fileInputRef.current?.click();
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const { items: sims, total: totalCount } = await listSims(page, rowsPerPage);
+      const filtered = filter === "all" ? sims : sims.filter((s) => (s.status ?? "").toLowerCase() === filter.toLowerCase());
+      setItems(filtered);
+      setTotal(totalCount);
+      setError(null);
+      // if (showToast) toast.success("SIMs refreshed", { description: `Loaded ${filtered.length} item${filtered.length === 1 ? "" : "s"}.` });
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load sims");
+      toast.error("Failed to load sims", { description: e?.message ?? "Unexpected error" });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const paginatedSimCards = useMemo(() => items, [items]);
+
+  const openAdd = () => {
+    setMode("add");
+    setCurrent(null);
+    setForm({});
+    setFormOpen(true);
+  };
+
+  const openEdit = (item: SimData) => {
+    setMode("edit");
+    setCurrent(item);
+    setForm({ ...item });
+    setFormOpen(true);
+  };
+
+  const openView = (item: SimData) => {
+    setCurrent(item);
+    setDrawerOpen(true);
+  };
+
+  const requestDelete = (item: SimData) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!itemToDelete) return;
+    try {
+      setDeleting(true);
+      await deleteSim(itemToDelete.id as any);
+      toast.success("SIM deleted", { description: itemToDelete.simNumber });
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+      await fetchData();
+    } catch (e: any) {
+      toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const onFormChange = (patch: Partial<SimData>) => setForm((p) => ({ ...(p ?? {}), ...patch }));
+
+  const handleFormSubmit = async () => {
+    setSubmitting(true);
+    try {
+      if (mode === "add") {
+        await createSim(form as SimData);
+        toast.success("SIM created", { description: form?.simNumber });
+      } else if (mode === "edit" && current?.id) {
+        await updateSim(current.id as any, form as Partial<SimData>);
+        toast.success("SIM updated", { description: form?.simNumber });
+      }
+      setFormOpen(false);
+      await fetchData();
+    } catch (e: any) {
+      toast.error(mode === "add" ? "Create failed" : "Update failed", { description: e?.message ?? "Unexpected error" });
+      throw e;
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onImportClick = () => fileInputRef.current?.click();
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // TODO: handle import parsing
+    // TODO: parse/import
     console.log("Import file:", file.name);
     e.currentTarget.value = "";
   };
 
   const onExport = () => {
-    // simple CSV export of currently filtered data (id, simNumber, phoneNumber, status)
     const rows = [
       ["id", "simNumber", "phoneNumber", "status"],
-      ...filteredSimCards.map((r) => [
-        r.id,
-        r.simNumber,
-        r.phoneNumber,
-        r.status,
-      ]),
+      ...items.map((r) => [r.id, r.simNumber, r.phoneNumber, r.status]),
     ];
-    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const csv = rows.map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -207,53 +158,28 @@ const SimPage = () => {
     URL.revokeObjectURL(url);
   };
 
- return (
+  // stat values (simple derivation)
+  const activeCount = items.filter((i) => (i.status ?? "").toLowerCase() === "active").length;
+  const suspendedCount = items.filter((i) => (i.status ?? "").toLowerCase() === "suspended").length;
+  const inactiveCount = items.filter((i) => (i.status ?? "").toLowerCase() === "inactive").length;
+
+  return (
     <div className="p-0 h-full flex flex-col">
-        <div className="grid grid-cols-4 gap-4 pb-4">
+      <div className="grid grid-cols-4 gap-4 pb-4">
+        <StatCard title="Active SIMs" value={String(activeCount).padStart(2, "0")} icon={<Users size={20} className="text-green-600" />} bgColor="bg-green-100" />
+        <StatCard title="Monthly Cost" value="KD 120.00" icon={<Calendar size={20} className="text-blue-600" />} bgColor="bg-blue-100" />
+        <StatCard title="Suspended" value={String(suspendedCount).padStart(2, "0")} icon={<UserMinus size={20} className="text-red-600" />} bgColor="bg-red-100" />
+        <StatCard title="Inactive" value={String(inactiveCount).padStart(2, "0")} icon={<Ban size={20} className="text-gray-600" />} bgColor="bg-gray-200" />
+      </div>
 
-      <StatCard
-        title="Active SIMs"
-        value="03"
-        icon={<Users size={20} className="text-green-600" />}
-        bgColor="bg-green-100"
-      />
-
-      <StatCard
-        title="Monthly Cost"
-        value="KD 120.00"
-        icon={<Calendar size={20} className="text-blue-600" />}
-        bgColor="bg-blue-100"
-      />
-
-      <StatCard
-        title="Suspended"
-        value="01"
-        icon={<UserMinus size={20} className="text-red-600" />}
-        bgColor="bg-red-100"
-      />
-
-      <StatCard
-        title="Inactive"
-        value="01"
-        icon={<Ban size={20} className="text-gray-600" />}
-        bgColor="bg-gray-200"
-      />
-
-    </div>
       <Card className="shadow-sm flex flex-col h-full bg-white overflow-hidden">
-
-        {/* ---------- Sticky Header ---------- */}
         <CardHeader className="bg-white sticky top-0 z-20 ">
           <div className="flex items-center justify-between w-full gap-2">
-            <h1 className="text-xl font-semibold">SIM Card Managemnt</h1>
-
-            {/* right controls: filter, export, import, add */}
+            <h1 className="text-xl font-semibold">SIM Card Management</h1>
             <div className="flex items-center gap-2">
               <div className="w-40">
                 <Select onValueChange={(v) => { setFilter(v); setPage(1); }} defaultValue="all">
-                  <SelectTrigger size="sm" className="w-full">
-                    <SelectValue placeholder="All" />
-                  </SelectTrigger>
+                  <SelectTrigger size="sm" className="w-full"><SelectValue placeholder="All" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
                     <SelectItem value="Active">Active</SelectItem>
@@ -263,31 +189,18 @@ const SimPage = () => {
                 </Select>
               </div>
 
-              <Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onExport}>
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Export Report</span>
-              </Button>
+            {false && (<><Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onExport}>
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Export Report</span>
+            </Button>
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xlsx"
-                className="hidden"
-                onChange={onFileChange}
-              />
-              <Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onImportClick}>
-                <Upload className="h-4 w-4" />
-                <span className="hidden sm:inline">Import</span>
-              </Button>
-
-              <Button
-                size="sm"
-                variant="default"
-                className="h-8 px-3 flex items-center gap-2"
-                onClick={() => {
-                  // TODO: open Add Hardware modal / navigate to add page
-                }}
-              >
+            <input ref={fileInputRef} type="file" accept=".csv,.xlsx" className="hidden" onChange={onFileChange} />
+            <Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onImportClick}>
+              <Upload className="h-4 w-4" />
+              <span className="hidden sm:inline">Import</span>
+            </Button>
+</>)}
+              <Button size="sm" variant="default" className="h-8 px-3 flex items-center gap-2" onClick={openAdd}>
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Add SIM Card</span>
               </Button>
@@ -295,30 +208,50 @@ const SimPage = () => {
           </div>
         </CardHeader>
 
-        {/* ---------- Scrollable Table Content ---------- */}
         <CardContent className="flex-1 overflow-y-auto px-4">
-          <SimTable
-            sim={paginatedSimCards}
-            onViewDetails={(item: any) => console.log("🟦 View:", item)}
-            onEdit={(item: any) => console.log("🟩 Edit:", item)}
-            onDelete={(item: any) => console.log("🟥 Delete:", item)}
-          />
+          {loading ? (
+            <ShimmerTable columnCount={10} rowCount={rowsPerPage} />
+          ) : error ? (
+            <div className="text-sm text-red-600">{error}</div>
+          ) : (
+            <SimTable sim={paginatedSimCards} onViewDetails={(item: any) => openView(item)} onEdit={(item: any) => openEdit(item)} onDelete={(item: any) => requestDelete(item)} />
+          )}
         </CardContent>
 
-        {/* ---------- Sticky Pagination At Bottom ---------- */}
         <div className="border-t bg-white sticky bottom-0 z-20 px-2">
-          <TablePagination
-            total={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(p: number) => setPage(p)}
-            onRowsPerPageChange={(r: number) => {
-              setRowsPerPage(r);
-              setPage(1);
-            }}
-          />
+          <TablePagination total={total} page={page} rowsPerPage={rowsPerPage} onPageChange={(p: number) => setPage(p)} onRowsPerPageChange={(r: number) => { setRowsPerPage(r); setPage(1); }} />
         </div>
       </Card>
+
+      <SimDetailsDrawer open={drawerOpen} item={current} onClose={() => setDrawerOpen(false)} />
+
+      <SimFormDialog
+        open={formOpen}
+        mode={mode}
+        form={form}
+        onChange={onFormChange}
+        onSubmit={handleFormSubmit}
+        onClose={() => setFormOpen(false)}
+        onDelete={mode === "edit" && current ? () => requestDelete(current) : undefined}
+        submitting={submitting}
+      />
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete SIM?</DialogTitle>
+            <DialogDescription>This action cannot be undone. It will permanently delete “{itemToDelete?.simNumber}”.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary" size="sm" disabled={deleting}>Cancel</Button>
+            </DialogClose>
+            <Button type="button" variant="destructive" size="sm" onClick={handleDeleteConfirmed} disabled={deleting}>
+              {deleting ? <> <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Deleting...</> : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

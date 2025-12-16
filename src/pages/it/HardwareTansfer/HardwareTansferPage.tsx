@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useEffect } from "react";
 import HardwareTransferTable from "./HardwareTansferTable";
 import TablePagination from "@/components/ui/tablePagination";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -9,8 +9,6 @@ import {
   Plus,
   UserMinus,
   Users,
-  Upload,
-  Download,
 } from "lucide-react";
 import StatCard from "@/components/ui/statCard";
 import {
@@ -20,283 +18,211 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import ShimmerTable from "@/components/ui/shimmerTable";
+import { toast } from "sonner";
+
+import {
+  listHardwareTransfers,
+  createHardwareTransfer,
+  updateHardwareTransfer,
+  deleteHardwareTransfer,
+  type HardwareTransferData,
+} from "@/services/itServices/HardwareTansferServices";
+
+import { HardwareTransferFormDialog } from "./HardwareTansferFormDialog";
+import { HardwareTransferDetailsDrawer } from "./HardwareTansferDetailsDrawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Loader2 } from "lucide-react";
 
 const HardwareTransferPage = () => {
-const hardwareTransferDummy = [
-  {
-    id: 1,
-    transferId: "HT-2024-001",
-    hardware: "Dell Latitude 7420",
-    hardwareType: "Laptop",
-    serialNumber: "DL-2023-001",
-
-    fromPerson: "John Smith",
-    fromDept: "Finance",
-
-    toPerson: "Sarah Johnson",
-    toDept: "Marketing",
-
-    transferDate: "2024-11-01",
-    returnDate: "-",
-    condition: "Excellent",
-    status: "Active",
-    reason: "Department relocation",
-  },
-
-  {
-    id: 2,
-    transferId: "HT-2024-002",
-    hardware: "HP EliteDesk 800 G6",
-    hardwareType: "Desktop",
-    serialNumber: "HP-2022-008",
-
-    fromPerson: "Michael Brown",
-    fromDept: "Operations",
-
-    toPerson: "Ahmed Al-Rashid",
-    toDept: "Finance",
-
-    transferDate: "2024-10-15",
-    returnDate: "2024-11-10",
-    condition: "Good",
-    status: "Returned",
-    reason: "Temporary backup during repair",
-  },
-
-  {
-    id: 3,
-    transferId: "HT-2024-003",
-    hardware: "MacBook Pro 16”",
-    hardwareType: "Laptop",
-    serialNumber: "AP-2023-012",
-
-    fromPerson: "IT Department",
-    fromDept: "IT",
-
-    toPerson: "Emma Wilson",
-    toDept: "Design",
-
-    transferDate: "2024-11-05",
-    returnDate: "-",
-    condition: "Excellent",
-    status: "Permanent Transfer",
-    reason: "New hire assignment",
-  },
-
-  {
-    id: 4,
-    transferId: "HT-2024-004",
-    hardware: "Lenovo ThinkPad T14",
-    hardwareType: "Laptop",
-    serialNumber: "LN-2020-015",
-
-    fromPerson: "Unassigned",
-    fromDept: "IT",
-
-    toPerson: "David Lee",
-    toDept: "Sales",
-
-    transferDate: "2024-11-12",
-    returnDate: "-",
-    condition: "Good",
-    status: "Pending",
-    reason: "New employee onboarding",
-  },
-
-  {
-    id: 5,
-    transferId: "HT-2024-002",
-    hardware: "HP EliteDesk 800 G6",
-    hardwareType: "Desktop",
-    serialNumber: "HP-2022-008",
-
-    fromPerson: "Michael Brown",
-    fromDept: "Operations",
-
-    toPerson: "Ahmed Al-Rashid",
-    toDept: "Finance",
-
-    transferDate: "2024-10-15",
-    returnDate: "2024-11-10",
-    condition: "Good",
-    status: "Returned",
-    reason: "Temporary backup during repair",
-  },
-
-  {
-    id: 6,
-    transferId: "HT-2024-001",
-    hardware: "Dell Latitude 7420",
-    hardwareType: "Laptop",
-    serialNumber: "DL-2023-001",
-
-    fromPerson: "John Smith",
-    fromDept: "Finance",
-
-    toPerson: "Sarah Johnson",
-    toDept: "Marketing",
-
-    transferDate: "2024-11-01",
-    returnDate: "-",
-    condition: "Excellent",
-    status: "Active",
-    reason: "Department relocation",
-  },
-];
-
-const transferStats = [
-  {
-    title: "Active Transfers",
-    value: "02",
-    icon: <Calendar size={20} className="text-blue-600" />,
-    bgColor: "bg-blue-100",
-  },
-  {
-    title: "Returned",
-    value: "02",
-    icon: <Users size={20} className="text-green-600" />,
-    bgColor: "bg-green-100",
-  },
-  {
-    title: "Permanent",
-    value: "01",
-    icon: <Ban size={20} className="text-gray-600" />,
-    bgColor: "bg-gray-200",
-  },
-  {
-    title: "Pending",
-    value: "01",
-    icon: <UserMinus size={20} className="text-red-600" />,
-    bgColor: "bg-red-100",
-  },
-];
-
+  const [items, setItems] = useState<HardwareTransferData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [page, setPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [total, setTotal] = useState<number>(0);
+
   const [filter, setFilter] = useState<string>("all");
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const filteredHardware = useMemo(() => {
-    if (filter === "all") return hardwareTransferDummy;
-    return hardwareTransferDummy.filter(
-      (s) => s.status?.toLowerCase() === filter.toLowerCase()
-    );
-  }, [filter, hardwareTransferDummy]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [mode, setMode] = useState<"add" | "edit">("add");
+  const [current, setCurrent] = useState<HardwareTransferData | null>(null);
+  const [form, setForm] = useState<Partial<HardwareTransferData>>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  const total = filteredHardware.length;
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<HardwareTransferData | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const paginatedHardware = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    return filteredHardware.slice(start, start + rowsPerPage);
-  }, [page, rowsPerPage, filteredHardware]);
-
-  const onImportClick = () => {
-    fileInputRef.current?.click();
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const { items: transfers, total: totalCount } = await listHardwareTransfers(page, rowsPerPage);
+      const filtered = filter === "all" ? transfers : transfers.filter((t) => (t.status ?? "").toLowerCase() === filter.toLowerCase());
+      setItems(filtered);
+      setTotal(totalCount);
+      setError(null);
+      // if (showToast) toast.success("Transfers refreshed", { description: `Loaded ${filtered.length}` });
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load transfers");
+      toast.error("Failed to load transfers", { description: e?.message ?? "Unexpected error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    // TODO: handle import parsing
-    console.log("Import file:", file.name);
-    e.currentTarget.value = "";
+  useEffect(() => {
+    fetchData();
+  }, [page, rowsPerPage, filter]);
+
+  const openAdd = () => {
+    setMode("add");
+    setCurrent(null);
+    setForm({});
+    setFormOpen(true);
   };
 
-  const onExport = () => {
-    // simple CSV export of currently filtered data (id, simNumber, phoneNumber, status)
-    const rows = [
-      ["id", "transferId", "hardware", "hardwareType", "serialNumber", "fromPerson", "fromDept", "toPerson", "toDept", "transferDate", "returnDate", "condition", "status", "reason"],
-      ...filteredHardware.map((r) => [
-        r.id,
-        r.transferId,
-        r.hardware,
-        r.hardwareType,
-        r.serialNumber,
-        r.fromPerson,
-        r.fromDept,
-        r.toPerson,
-        r.toDept,
-        r.transferDate,
-        r.returnDate,
-        r.condition,
-        r.status,
-        r.reason,
-      ]),
+  const openEdit = (item: HardwareTransferData) => {
+    setMode("edit");
+    setCurrent(item);
+    setForm({ ...item });
+    setFormOpen(true);
+  };
+
+  const openView = (item: HardwareTransferData) => {
+    setCurrent(item);
+    setDrawerOpen(true);
+  };
+
+  const requestDelete = (item: HardwareTransferData) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!itemToDelete) return;
+    try {
+      setDeleting(true);
+      await deleteHardwareTransfer(itemToDelete.id as any);
+      toast.success("Transfer deleted", { description: itemToDelete.transferReason ?? String(itemToDelete.id) });
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+      await fetchData();
+    } catch (e: any) {
+      toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const onFormChange = (patch: Partial<HardwareTransferData>) => setForm((p) => ({ ...(p ?? {}), ...patch }));
+
+  const handleFormSubmit = async () => {
+    setSubmitting(true);
+    try {
+      if (mode === "add") {
+        await createHardwareTransfer(form as HardwareTransferData);
+        toast.success("Transfer created", { description: (form as any).transferId ?? "" });
+      } else if (mode === "edit" && current?.id) {
+        await updateHardwareTransfer(current.id as any, form as Partial<HardwareTransferData>);
+        toast.success("Transfer updated", { description: (form as any).transferId ?? "" });
+      }
+      setFormOpen(false);
+      await fetchData();
+    } catch (e: any) {
+      toast.error(mode === "add" ? "Create failed" : "Update failed", { description: e?.message ?? "Unexpected error" });
+      throw e;
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // const onImportClick = () => fileInputRef.current?.click();
+
+  // const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+  //   console.log("Import file:", file.name);
+  //   e.currentTarget.value = "";
+  // };
+
+  // const onExport = () => {
+  //   const rows = [
+  //     ["id","transferId","hardwareName","serialNumber","fromUser","toUser","transferDate","expectedReturnDate","status"],
+  //     ...items.map(r => [r.id,r.transferId,r.hardwareName,r.serialNumber,r.fromUser,r.toUser,r.transferDate,r.expectedReturnDate,r.status])
+  //   ];
+  //   const csv = rows.map(r => r.map(c => `"${String(c ?? "").replace(/"/g,'""')}"`).join(",")).join("\n");
+  //   const blob = new Blob([csv], { type: "text/csv" });
+  //   const url = URL.createObjectURL(blob);
+  //   const a = document.createElement("a");
+  //   a.href = url;
+  //   a.download = "hardware-transfers.csv";
+  //   a.click();
+  //   URL.revokeObjectURL(url);
+  // };
+
+  const transferStats = useMemo(() => {
+    const active = items.filter(i => (i.status ?? "").toLowerCase() === "active").length;
+    const returned = items.filter(i => (i.status ?? "").toLowerCase() === "returned").length;
+    const permanent = items.filter(i => (i.status ?? "").toLowerCase() === "permanent transfer").length;
+    const pending = items.filter(i => (i.status ?? "").toLowerCase() === "pending").length;
+    return [
+      { title: "Active Transfers", value: String(active).padStart(2,"0"), icon: <Calendar size={20} className="text-blue-600" />, bgColor: "bg-blue-100" },
+      { title: "Returned", value: String(returned).padStart(2,"0"), icon: <Users size={20} className="text-green-600" />, bgColor: "bg-green-100" },
+      { title: "Permanent", value: String(permanent).padStart(2,"0"), icon: <Ban size={20} className="text-gray-600" />, bgColor: "bg-gray-200" },
+      { title: "Pending", value: String(pending).padStart(2,"0"), icon: <UserMinus size={20} className="text-red-600" />, bgColor: "bg-red-100" },
     ];
-    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "sims-export.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  }, [items]);
 
- return (
+  const paginatedHardware = useMemo(() => items, [items]);
+
+  return (
     <div className="p-0 h-full flex flex-col">
-        <div className="grid grid-cols-4 gap-4 pb-4">
+      <div className="grid grid-cols-4 gap-4 pb-4">
+        {transferStats.map((s, idx) => <StatCard key={idx} title={s.title} value={s.value} icon={s.icon} bgColor={s.bgColor} />)}
+      </div>
 
- {transferStats.map((item, index) => (
-    <StatCard
-      key={index}
-      title={item.title}
-      value={item.value}
-      icon={item.icon}
-      bgColor={item.bgColor}
-    />
-  ))}
-
-    </div>
       <Card className="shadow-sm flex flex-col h-full bg-white overflow-hidden">
-
-        {/* ---------- Sticky Header ---------- */}
         <CardHeader className="bg-white sticky top-0 z-20 ">
           <div className="flex items-center justify-between w-full gap-2">
-            <h1 className="text-xl font-semibold">Hardware Tansfer Tracking</h1>
-
-            {/* right controls: filter, export, import, add */}
+            <h1 className="text-xl font-semibold">Hardware Transfer Tracking</h1>
             <div className="flex items-center gap-2">
               <div className="w-40">
                 <Select onValueChange={(v) => { setFilter(v); setPage(1); }} defaultValue="all">
-                  <SelectTrigger size="sm" className="w-full">
-                    <SelectValue placeholder="All" />
-                  </SelectTrigger>
+                  <SelectTrigger size="sm" className="w-full"><SelectValue placeholder="All" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
                     <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
-                    <SelectItem value="Suspended">Suspended</SelectItem>
+                    <SelectItem value="Returned">Returned</SelectItem>
+                    <SelectItem value="Permanent Transfer">Permanent Transfer</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onExport}>
+              {/* <Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2">
                 <Download className="h-4 w-4" />
                 <span className="hidden sm:inline">Export Report</span>
               </Button>
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xlsx"
-                className="hidden"
-                onChange={onFileChange}
-              />
+              <input ref={fileInputRef} type="file" accept=".csv,.xlsx" className="hidden" onChange={onFileChange} />
               <Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onImportClick}>
                 <Upload className="h-4 w-4" />
                 <span className="hidden sm:inline">Import</span>
-              </Button>
+              </Button> */}
 
-              <Button
-                size="sm"
-                variant="default"
-                className="h-8 px-3 flex items-center gap-2"
-                onClick={() => {
-                  // TODO: open Add Hardware modal / navigate to add page
-                }}
-              >
+              <Button size="sm" variant="default" className="h-8 px-3 flex items-center gap-2" onClick={openAdd}>
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">New Transfer</span>
               </Button>
@@ -304,30 +230,73 @@ const transferStats = [
           </div>
         </CardHeader>
 
-        {/* ---------- Scrollable Table Content ---------- */}
         <CardContent className="flex-1 overflow-y-auto px-4">
-          <HardwareTransferTable
-            hardware={paginatedHardware}
-            onViewDetails={(item: any) => console.log("🟦 View:", item)}
-            onEdit={(item: any) => console.log("🟩 Edit:", item)}
-            onDelete={(item: any) => console.log("🟥 Delete:", item)}
-          />
+          {loading ? (
+           <ShimmerTable columnCount={10} rowCount={rowsPerPage} />
+          ) : error ? (
+            <div className="text-sm text-red-600">{error}</div>
+          ) : (
+            <HardwareTransferTable
+              hardware={paginatedHardware}
+              onViewDetails={(item) => openView(item)}
+              onEdit={(item) => openEdit(item)}
+              onDelete={(item) => requestDelete(item)}
+            />
+          )}
         </CardContent>
 
-        {/* ---------- Sticky Pagination At Bottom ---------- */}
         <div className="border-t bg-white sticky bottom-0 z-20 px-2">
-          <TablePagination
-            total={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(p: number) => setPage(p)}
-            onRowsPerPageChange={(r: number) => {
-              setRowsPerPage(r);
-              setPage(1);
-            }}
-          />
+          <TablePagination total={total} page={page} rowsPerPage={rowsPerPage} onPageChange={(p: number) => setPage(p)} onRowsPerPageChange={(r: number) => { setRowsPerPage(r); setPage(1); }} />
         </div>
       </Card>
+
+      <HardwareTransferDetailsDrawer open={drawerOpen} item={current} onClose={() => setDrawerOpen(false)} />
+
+      <HardwareTransferFormDialog
+        open={formOpen}
+        mode={mode}
+        form={form}
+        onChange={onFormChange}
+        onSubmit={handleFormSubmit}
+        onClose={() => setFormOpen(false)}
+        onDelete={mode === "edit" && current ? () => requestDelete(current) : undefined}
+        submitting={submitting}
+      />
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete transfer?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. It will permanently delete “
+              {itemToDelete?.hardwareName || itemToDelete?.transferReason || String(itemToDelete?.id) || "this transfer"}”.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary" size="sm" disabled={deleting}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={handleDeleteConfirmed}
+              disabled={deleting}
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

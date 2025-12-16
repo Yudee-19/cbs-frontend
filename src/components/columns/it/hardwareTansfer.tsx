@@ -4,7 +4,7 @@ import { ActionButtonWithTooltip } from "@/components/ui/actionButtonWithTooltip
 export const getTransferStatusBadge = (status: string) => {
   let cls = "";
 
-  switch (status.toLowerCase()) {
+  switch (String(status).toLowerCase()) {
     case "active":
       cls = "bg-blue-100 text-blue-600 border border-blue-200";
       break;
@@ -22,7 +22,7 @@ export const getTransferStatusBadge = (status: string) => {
   }
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-medium ${cls}`}>
+    <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${cls}`}>
       {status}
     </span>
   );
@@ -34,79 +34,118 @@ export const getHardwareTransferColumns = (
   onEdit?: (row: any) => void,
   onDelete?: (row: any) => void
 ) => [
-  { key: "transferId", header: "Transfer ID" },
+  {
+    key: "transferId",
+    header: "Transfer ID",
+    render: (row: any) => row.id ?? row._id ?? row.transferId ?? "",
+  },
 
   {
     key: "hardware",
     header: "Hardware",
     render: (row: any) => (
       <div className="flex flex-col leading-tight">
-        <span className="font-medium">{row.hardware}</span>
-        <span className="text-xs text-gray-500">{row.hardwareType}</span>
+        <span className="text-black font-medium">{row.hardwareName ?? row.hardware ?? ""}</span>
+        {/* optional second line: show transferType or empty */}
+        <span className="text-xs text-gray-500">{row.transferType ?? ""}</span>
       </div>
     ),
   },
 
-  { key: "serialNumber", header: "Serial Number" },
+  {
+    key: "serialNumber",
+    header: "Serial Number",
+    render: (row: any) => row.serialNumber ?? "",
+  },
 
   {
     key: "fromPerson",
     header: "From",
-    render: (row: any) => (
-      <div className="flex flex-col">
-        <span>{row.fromPerson}</span>
-        <span className="text-xs text-gray-500">{row.fromDept}</span>
-      </div>
-    ),
+    render: (row: any) => {
+      const from = row.fromUser ?? row.fromPerson ?? "";
+      const [name, dept] = String(from).split(" - ").map((s) => s?.trim());
+      return (
+        <div className="flex flex-col">
+          <span className="text-black font-medium">{name ?? from}</span>
+          <span className="text-xs text-gray-500">{dept ?? row.fromDept ?? ""}</span>
+        </div>
+      );
+    },
   },
 
   {
     key: "toPerson",
     header: "To",
-    render: (row: any) => (
-      <div className="flex flex-col">
-        <span>{row.toPerson}</span>
-        <span className="text-xs text-gray-500">{row.toDept}</span>
-      </div>
-    ),
+    render: (row: any) => {
+      const to = row.toUser ?? row.toPerson ?? "";
+      const [name, dept] = String(to).split(" - ").map((s) => s?.trim());
+      return (
+        <div className="flex flex-col">
+          <span className="text-black font-medium">{name ?? to}</span>
+          <span className="text-xs text-gray-500">{dept ?? row.toDept ?? ""}</span>
+        </div>
+      );
+    },
   },
 
-  { key: "transferDate", header: "Transfer Date" },
-  { key: "returnDate", header: "Return Date" },
-  { key: "condition", header: "Condition" },
+  {
+    key: "transferDate",
+    header: "Transfer Date",
+    render: (row: any) => {
+      const d = row.transferDate ?? row.createdAt ?? "";
+      return d ? new Date(d).toLocaleDateString() : "";
+    },
+  },
+  {
+    key: "returnDate",
+    header: "Return Date",
+    render: (row: any) => {
+      const d = row.expectedReturnDate ?? row.returnDate ?? "";
+      return d ? new Date(d).toLocaleDateString() : "";
+    },
+  },
+  {
+    key: "condition",
+    header: "Condition",
+    render: (row: any) => row.hardwareCondition ?? row.condition ?? "",
+  },
 
   {
     key: "status",
     header: "Status",
-    render: (row: any) => getTransferStatusBadge(row.status),
+    render: (row: any) => getTransferStatusBadge(row.status ?? ""),
   },
 
-  { key: "reason", header: "Reason" },
+  {
+    key: "reason",
+    header: "Reason",
+    render: (row: any) => row.transferReason ?? row.reason ?? "",
+  },
 
   {
     key: "actions",
     header: "Actions",
     render: (row: any) => (
       <div className="flex gap-2">
-        <ActionButtonWithTooltip
+        { false && <ActionButtonWithTooltip
           icon={<Eye size={18} />}
           tooltip="View"
           onClick={() => onView?.(row)}
           colorClass="h-7 w-7 bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded-md"
-        />
+        />}
 
         <ActionButtonWithTooltip
           icon={<Pencil size={18} />}
           tooltip="Edit"
           onClick={() => onEdit?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-md"
+          colorClass="h-7 w-7 bg-gray-100 hover:bg-green-50 hover:text-primary rounded-md text-primary"
         />
 
         <ActionButtonWithTooltip
           icon={<Trash2 size={18} />}
           tooltip="Delete"
           onClick={() => onDelete?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-red-50 hover:text-red-600 rounded-md"
+          colorClass="h-7 w-7 bg-gray-100 hover:bg-red-50 hover:text-primary rounded-md text-primary"
         />
       </div>
     ),

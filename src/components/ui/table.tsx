@@ -63,7 +63,7 @@ function DataTable<T extends { id: string }>({
             {columns.map((col) => (
               <th
                 key={col.key.toString()}
-                className={`p-2 pl-5 h-10 text-left table-10px align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]   text-xs", ${col.key === 'id' || col.key === 'userId' ? 'font-bold text-gray-900' : 'font-semibold text-[#1E1E1E]'}  cursor-pointer`}
+                className={`p-2 pl-5 h-10 table-10px align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-xs ${col.key === 'id' || col.key === 'userId' ? 'font-bold text-gray-900' : 'font-semibold text-[#1E1E1E]'} ${col.key === 'status'? ' text-center' : 'text-left'} cursor-pointer` }
               >
                 {col.header}
               </th>
@@ -99,9 +99,13 @@ function DataTable<T extends { id: string }>({
                 {columns.map((col) => (
                   <td
                     key={col.key.toString()}
-                    className={`p-2 pl-5 whitespace-nowrap border-b  hover:bg-gray-50${
+                    className={`p-2 pl-5 whitespace-nowrap border-b hover:bg-gray-50${
                       col.cellClassName ? col.cellClassName(row) : ''
-                    } ${columnStyles?.[col.key.toString()] || 'text-gray-500'}`}
+                    } ${columnStyles?.[col.key.toString()] || 'text-gray-500'}${
+                      (col.key === 'status')
+                        ? ' text-center'
+                        : ''
+                    }`}
                     data-slot="table-cell"
                   >
                     {col.render

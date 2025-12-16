@@ -1,5 +1,9 @@
+import type { Hardware } from '@/services/itServices/HardwareServices';
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { ActionButtonWithTooltip } from "../../ui/actionButtonWithTooltip";
+
+const fmtDate = (iso?: string) =>
+  iso ? new Date(iso).toLocaleDateString() : '';
 
 export const getStatusBadge = (status: string) => {
   let colorClass = "";
@@ -13,7 +17,7 @@ export const getStatusBadge = (status: string) => {
 
     case "under repair":
       colorClass =
-        "bg-blue-100 text-blue-600 border border-blue-200";
+        "bg-blue-100 text-primary border border-blue-200";
       break;
 
     case "inactive":
@@ -29,82 +33,64 @@ export const getStatusBadge = (status: string) => {
 
   return (
     <span
-      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${colorClass}`}
+      className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${colorClass}`}
     >
       {text}
     </span>
   );
 };
 
-
 export const getHardwareTableColumns = (
-  onViewDetails?: (item: any) => void,
-  onEdit?: (item: any) => void,
-  onDelete?: (item: any) => void
+  onViewDetails?: (item: Hardware) => void,
+  onEdit?: (item: Hardware) => void,
+  onDelete?: (item: Hardware) => void
 ) => [
+  { key: "deviceName", header: "Device Name" },
+  { key: "type", header: "Type" },
+  { key: "serialNumber", header: "Serial Number" },
+  { key: "operatingSystem", header: "Operating System" }, // added
+  { key: "processor", header: "Processor" },
+  { key: "ram", header: "RAM" },
+  { key: "storage", header: "Storage" },
   {
-    key: "deviceName",
-    header: "Device Name",
-  },
-  {
-    key: "type",
-    header: "Type",
-  },
-  {
-    key: "serialNumber",
-    header: "Serial Number",
-  },
-  {
-    key: "processor",
-    header: "Processor",
-  },
-  {
-    key: "ram",
-    header: "RAM",
-  },
-  {
-    key: "storage",
-    header: "Storage",
+    key: "purchaseDate",
+    header: "Purchase Date",
+    render: (row: Hardware) => fmtDate(row.purchaseDate), // added + formatted
   },
   {
     key: "warrantyExpiry",
     header: "Warranty Expiry",
+    render: (row: Hardware) => fmtDate(row.warrantyExpiry), // formatted
   },
-  {
-    key: "assignedTo",
-    header: "Assigned To",
-  },
-  {
-    key: "department",
-    header: "Department",
-  },
+  { key: "assignedTo", header: "Assigned To" },
+  { key: "department", header: "Department" },
   {
     key: "status",
     header: "Status",
-    render: (row: any) => getStatusBadge(row.status),
+    render: (row: Hardware) => getStatusBadge(row.status),
   },
   {
     key: "actions",
     header: "Actions",
-    render: (row: any) => (
+    render: (row: Hardware) => (
       <div className="flex space-x-3 cursor-pointer">
-        <ActionButtonWithTooltip
+       { false && <ActionButtonWithTooltip
           icon={<Eye size={18} />}
           tooltip="View Details"
           onClick={() => onViewDetails?.(row)}
           colorClass="h-7 w-7 p-0 bg-gray-100 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors rounded-md"
-        />
+        />}
         <ActionButtonWithTooltip
           icon={<Pencil size={18} />}
           tooltip="Edit Asset"
           onClick={() => onEdit?.(row)}
-          colorClass="h-7 w-7 p-0 bg-gray-100 text-gray-500 hover:text-green-600 hover:bg-green-50 transition-colors rounded-md"
+          colorClass="h-7 w-7 p-0 bg-gray-100 text-primary hover:text-primary hover:bg-green-50 transition-colors rounded-md"
         />
         <ActionButtonWithTooltip
           icon={<Trash2 size={18} />}
           tooltip="Delete Asset"
           onClick={() => onDelete?.(row)}
-          colorClass="h-7 w-7 p-0 bg-gray-100 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors rounded-md"
+          colorClass="h-7 w-7 p-0 bg-gray-100 text-primary hover:text-primary hover:bg-red-50 transition-colors rounded-md"
         />
       </div>
     ),
