@@ -189,17 +189,17 @@ const SimPage = () => {
                 </Select>
               </div>
 
-              <Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onExport}>
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Export Report</span>
-              </Button>
+            {false && (<><Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onExport}>
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Export Report</span>
+            </Button>
 
-              <input ref={fileInputRef} type="file" accept=".csv,.xlsx" className="hidden" onChange={onFileChange} />
-              <Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onImportClick}>
-                <Upload className="h-4 w-4" />
-                <span className="hidden sm:inline">Import</span>
-              </Button>
-
+            <input ref={fileInputRef} type="file" accept=".csv,.xlsx" className="hidden" onChange={onFileChange} />
+            <Button size="sm" variant="outline" className="h-8 px-2 flex items-center gap-2" onClick={onImportClick}>
+              <Upload className="h-4 w-4" />
+              <span className="hidden sm:inline">Import</span>
+            </Button>
+</>)}
               <Button size="sm" variant="default" className="h-8 px-3 flex items-center gap-2" onClick={openAdd}>
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Add SIM Card</span>
