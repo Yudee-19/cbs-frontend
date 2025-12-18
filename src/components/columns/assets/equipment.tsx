@@ -1,5 +1,6 @@
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { ActionButtonWithTooltip } from "@/components/ui/actionButtonWithTooltip";
+import Setting from "@/assets/settings.png"
 
 export const getEquipmentStatusBadge = (status: string) => {
   let cls = "";
@@ -33,7 +34,7 @@ export const getEquipmentTableColumns = (
     header: "Equipment Name",
     render: (row: any) => (
       <div className="flex items-center gap-2">
-        ⚙️
+         <img src={Setting} alt="settings" className="h-3 w-3 object-contain" />
         <span>{row.equipmentName}</span>
       </div>
     ),
@@ -59,25 +60,25 @@ export const getEquipmentTableColumns = (
     render: (row: any) => (
       <div className="flex gap-2">
 
-        <ActionButtonWithTooltip
+        { false && <ActionButtonWithTooltip
           icon={<Eye size={18} />}
           tooltip="View"
           onClick={() => onView?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded-md"
+          colorClass="h-7 w-7 bg-gray-100 hover:bg-blue-50 hover:text-primary text-primaryrounded-md"
         />
-
+}
         <ActionButtonWithTooltip
           icon={<Pencil size={18} />}
           tooltip="Edit"
           onClick={() => onEdit?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-md"
+          colorClass="h-7 w-7 bg-gray-100 hover:bg-green-50 hover:text-primary text-primary rounded-md"
         />
 
         <ActionButtonWithTooltip
           icon={<Trash2 size={18} />}
           tooltip="Delete"
           onClick={() => onDelete?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-red-50 hover:text-red-600 rounded-md"
+          colorClass="h-7 w-7 bg-gray-100 hover:bg-red-50 hover:text-primary text-primary rounded-md"
         />
 
       </div>

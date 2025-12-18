@@ -13,7 +13,7 @@ const LandBuildingTable: React.FC<LandBuildingTableProps> = ({
   landBuildings,
   onViewDetails,
   onEdit,
-//   onDelete,
+  onDelete,
 }) => {
   return (
     <DataTable
@@ -24,7 +24,7 @@ const LandBuildingTable: React.FC<LandBuildingTableProps> = ({
       columns={getLandBuildingColumns(
         (item) => onViewDetails?.(item),
         (item) => onEdit?.(item),
-        // (item) => onDelete?.(item)
+        (item) => onDelete?.(item)
       )}
     />
   );

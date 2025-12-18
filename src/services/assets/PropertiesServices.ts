@@ -1,3 +1,5 @@
+import axios, { type AxiosResponse } from "axios";
+
 export type PropertyData = {
   id?: number | string;
   createdAt?: string;
@@ -23,9 +25,18 @@ export type PropertyData = {
 
 const API_BASE = "https://company-documnets.onrender.com/api/properties";
 
-async function handleResponse<T = any>(res: Response): Promise<T> {
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+async function handleAxios<T = any>(p: Promise<AxiosResponse<T>>): Promise<T> {
+  try {
+    const res = await p;
+    return res.data as T;
+  } catch (err: any) {
+    const msg =
+      err?.response?.data?.message ??
+      err?.response?.data ??
+      err?.message ??
+      "Request failed";
+    throw new Error(typeof msg === "string" ? msg : JSON.stringify(msg));
+  }
 }
 
 // Normalize to { items, total }
@@ -34,37 +45,40 @@ export async function listProperties(
   perPage = 25
 ): Promise<{ items: PropertyData[]; total: number }> {
   const url = `${API_BASE}?page=${page}&limit=${perPage}`;
-  const json = await handleResponse<any>(await fetch(url));
+  const json = await handleAxios<any>(axios.get(url));
   const items: PropertyData[] = json?.data?.properties ?? [];
-  const total: number = Number(json?.data?.pagination?.totalCount ?? items.length ?? 0);
+  const total: number = Number(
+    json?.data?.pagination?.totalCount ?? items.length ?? 0
+  );
   return { items, total };
 }
 
 export async function getProperty(id: number | string) {
-  const res = await fetch(`${API_BASE}/${id}`);
-  return handleResponse<PropertyData>(res);
+  return handleAxios<PropertyData>(axios.get(`${API_BASE}/${id}`));
 }
 
 export async function createProperty(data: PropertyData) {
-  const res = await fetch(API_BASE, {
-    method: "POST",
+  return handleAxios<PropertyData>(axios.post(API_BASE, data, {
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse<PropertyData>(res);
+  }));
 }
 
-export async function updateProperty(id: number | string, data: Partial<PropertyData>) {
-  const res = await fetch(`${API_BASE}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse<PropertyData>(res);
+export async function updateProperty(
+  id: number | string,
+  data: Partial<PropertyData>
+) {
+  return handleAxios<PropertyData>(
+    axios.put(`${API_BASE}/${id}`, data, {
+      headers: { "Content-Type": "application/json" },
+    })
+  );
 }
 
 export async function deleteProperty(id: number | string) {
-  const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error(await res.text());
-  return true;
+  try {
+    await handleAxios(axios.delete(`${API_BASE}/${id}`));
+    return true;
+  } catch (err) {
+    throw err;
+  }
 }

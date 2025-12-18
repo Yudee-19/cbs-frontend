@@ -1,3 +1,5 @@
+import axios, { type AxiosResponse } from "axios";
+
 export type VehicleData = {
   id?: number | string;
   createdAt?: string;
@@ -31,9 +33,18 @@ export type VehicleData = {
 
 const API_BASE = "https://company-documnets.onrender.com/api/vehicles";
 
-async function handleResponse<T = any>(res: Response): Promise<T> {
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+async function handleAxios<T = any>(p: Promise<AxiosResponse<T>>): Promise<T> {
+  try {
+    const res = await p;
+    return res.data as T;
+  } catch (err: any) {
+    const msg =
+      err?.response?.data?.message ??
+      err?.response?.data ??
+      err?.message ??
+      "Request failed";
+    throw new Error(typeof msg === "string" ? msg : JSON.stringify(msg));
+  }
 }
 
 export async function listVehicles(
@@ -41,7 +52,7 @@ export async function listVehicles(
   perPage = 25
 ): Promise<{ items: VehicleData[]; total: number }> {
   const url = `${API_BASE}?page=${page}&limit=${perPage}`;
-  const json = await handleResponse<any>(await fetch(url));
+  const json = await handleAxios<any>(axios.get(url));
   const items: VehicleData[] = json?.data?.vehicles ?? [];
   const total: number = Number(
     json?.data?.pagination?.totalCount ?? items.length ?? 0
@@ -50,30 +61,26 @@ export async function listVehicles(
 }
 
 export async function getVehicle(id: number | string) {
-  const res = await fetch(`${API_BASE}/${id}`);
-  return handleResponse<VehicleData>(res);
+  return handleAxios<VehicleData>(axios.get(`${API_BASE}/${id}`));
 }
 
 export async function createVehicle(data: VehicleData) {
-  const res = await fetch(API_BASE, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse<VehicleData>(res);
+  return handleAxios<VehicleData>(
+    axios.post(API_BASE, data, { headers: { "Content-Type": "application/json" } })
+  );
 }
 
 export async function updateVehicle(id: number | string, data: Partial<VehicleData>) {
-  const res = await fetch(`${API_BASE}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse<VehicleData>(res);
+  return handleAxios<VehicleData>(
+    axios.put(`${API_BASE}/${id}`, data, { headers: { "Content-Type": "application/json" } })
+  );
 }
 
 export async function deleteVehicle(id: number | string) {
-  const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error(await res.text());
-  return true;
+  try {
+    await handleAxios(axios.delete(`${API_BASE}/${id}`));
+    return true;
+  } catch (err) {
+    throw err;
+  }
 }
