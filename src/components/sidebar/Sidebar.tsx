@@ -23,7 +23,7 @@ export function Sidebar({ children }: SidebarProps) {
         <SheetContent
           side="left"
           className={cn(
-            'w-[18rem] p-0 border-0 h-[100svh] flex flex-col text-xs bg-sidebar-primary',
+            'w-[18rem] p-0 border-0 h-[100svh] flex flex-col text-xs bg-white',
             '[&>button]:hidden'
           )}
         >
@@ -38,11 +38,11 @@ export function Sidebar({ children }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col h-screen bg-white shadow-md border-r bg-sidebar-primary font-inter',
+        'hidden md:flex flex-col h-screen bg-white shadow-md border-r  font-inter',
         state === 'expanded' ? 'w-64' : 'w-20'
       )}
     >
-      <div className="px-0 border-b border-b-primary pb-2 pt-2">
+      <div className="px-0  pb-2 pt-2">
         <SidebarLogo />
       </div>
 
@@ -59,7 +59,7 @@ export function Sidebar({ children }: SidebarProps) {
       </div> */}
 
       {/* Admin Portal footer */}
-      <div className="mx-2 mb-2 border-t border-t-primary">
+      <div className="border-t border-t-primary">
         {/* ProfileMenu handles avatar image check + fallback */}
         <div className='pt-3'>
         <ProfileMenu

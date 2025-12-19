@@ -1,149 +1,198 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TablePagination from "@/components/ui/tablePagination";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import LegalDocumentTable from "./LegalDocumentTable";
+import ShimmerTable from "@/components/ui/shimmerTable";
+import { toast } from "sonner";
+import {
+  listDocuments,
+  createDocument,
+  updateDocumentById,
+  deleteDocument,
+  type LegalDoc,
+  type LegalDocData,
+} from "@/services/company-documents/legalDocServices";
+import { LegalDocumentFormDialog } from "./LegalDocumentFormDialog";
+import { LegalDocumentDetailsDrawer } from "./LegalDocumentDetailsDrawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
+
+type Mode = "view" | "edit" | "add";
+
+const emptyForm: LegalDocData = {
+  name: "",
+  category: "",
+  documentDate: new Date().toISOString(),
+  partiesInvolved: "",
+  fileKey: "",
+};
 
 const LegalDocumentPage = () => {
-const legalDocumentsDummy = [
-  {
-    id: 1,
-    documentName: "Master Service Agreement",
-    category: "Contract",
-    documentDate: "2025-01-15",
-    partiesInvolved: "CWG-ITS & ABC Corp",
-    uploadedBy: "Legal Dept",
-    status: "Active",
-  },
-  {
-    id: 2,
-    documentName: "Vendor Agreement 2024",
-    category: "Contract",
-    documentDate: "2024-03-20",
-    partiesInvolved: "CWG-ITS & XYZ Supplies",
-    uploadedBy: "Procurement",
-    status: "Archived",
-  },
-  {
-    id: 3,
-    documentName: "Non-Disclosure Agreement Template",
-    category: "Template",
-    documentDate: "2024-12-01",
-    partiesInvolved: "Standard Template",
-    uploadedBy: "Legal Dept",
-    status: "Active",
-  },
-  {
-    id: 4,
-    documentName: "Vendor Agreement 2024",
-    category: "Contract",
-    documentDate: "2024-03-20",
-    partiesInvolved: "CWG-ITS & XYZ Supplies",
-    uploadedBy: "Procurement",
-    status: "Archived",
-  },
-  {
-    id: 5,
-    documentName: "Employment Agreement Template",
-    category: "Template",
-    documentDate: "2024-11-15",
-    partiesInvolved: "CWG-ITS & Employees",
-    uploadedBy: "HR",
-    status: "Active",
-  },
+  const [items, setItems] = useState<LegalDoc[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Repeated entries like screenshot
-  {
-    id: 6,
-    documentName: "Vendor Agreement 2024",
-    category: "Contract",
-    documentDate: "2024-03-20",
-    partiesInvolved: "CWG-ITS & XYZ Supplies",
-    uploadedBy: "Procurement",
-    status: "Archived",
-  },
-  {
-    id: 7,
-    documentName: "Employment Agreement Template",
-    category: "Template",
-    documentDate: "2024-11-15",
-    partiesInvolved: "CWG-ITS & Employees",
-    uploadedBy: "HR",
-    status: "Active",
-  },
-  {
-    id: 8,
-    documentName: "Vendor Agreement 2024",
-    category: "Contract",
-    documentDate: "2024-03-20",
-    partiesInvolved: "CWG-ITS & XYZ Supplies",
-    uploadedBy: "Procurement",
-    status: "Archived",
-  },
-  {
-    id: 9,
-    documentName: "Employment Agreement Template",
-    category: "Template",
-    documentDate: "2024-11-15",
-    partiesInvolved: "CWG-ITS & Employees",
-    uploadedBy: "HR",
-    status: "Active",
-  },
-  {
-    id: 10,
-    documentName: "Vendor Agreement 2024",
-    category: "Contract",
-    documentDate: "2024-03-20",
-    partiesInvolved: "CWG-ITS & XYZ Supplies",
-    uploadedBy: "Procurement",
-    status: "Archived",
-  },
-];
-
-
-  const total = legalDocumentsDummy.length;
   const [page, setPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [total, setTotal] = useState<number>(0);
 
-  const paginatedLegalDocuments = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    return legalDocumentsDummy.slice(start, start + rowsPerPage);
-  }, [page, rowsPerPage, legalDocumentsDummy]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
- return (
+  const [mode, setMode] = useState<Mode>("view");
+  const [current, setCurrent] = useState<LegalDoc | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<LegalDoc | null>(null);
+
+  const [form, setForm] = useState<LegalDocData>(emptyForm);
+
+  const fetchData = async (showToast = false) => {
+    try {
+      setLoading(true);
+      const { total: totalCount, items } = await listDocuments(page, rowsPerPage);
+      setItems(Array.isArray(items) ? items : []);
+      setTotal(Number(totalCount) || (Array.isArray(items) ? items.length : 0));
+      setError(null);
+      if (showToast) {
+        toast.success("Documents refreshed", {
+          description: `Loaded ${items.length} item${items.length === 1 ? "" : "s"}.`,
+        });
+      }
+    } catch (e: any) {
+      setError(e?.message || "Failed to load documents.");
+      toast.error("Failed to load documents", { description: e?.message ?? "Unexpected error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(false);
+  }, [page, rowsPerPage]);
+
+  const paginated = useMemo(() => items, [items]);
+
+  const openAdd = () => {
+    setMode("add");
+    setCurrent(null);
+    setForm(emptyForm);
+    setEditDialogOpen(true);
+  };
+
+  const openView = (item: LegalDoc) => {
+    setMode("view");
+    setCurrent(item);
+    setDrawerOpen(true);
+  };
+
+  const openEdit = (item: LegalDoc) => {
+    setMode("edit");
+    setCurrent(item);
+    setForm({
+      name: item.name,
+      category: item.category,
+      documentDate: item.documentDate ?? new Date().toISOString(),
+      partiesInvolved: item.partiesInvolved,
+      fileKey: item.fileKey ?? "",
+    });
+    setEditDialogOpen(true);
+  };
+
+  const requestDelete = (item: LegalDoc) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!itemToDelete) return;
+    try {
+      setDeleting(true);
+      await deleteDocument(itemToDelete.id);
+      toast.success("Document deleted", { description: itemToDelete.name });
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+      await fetchData(true);
+    } catch (e: any) {
+      toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const toISODate = (v: string) => {
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return new Date().toISOString();
+    return d.toISOString();
+  };
+
+  const onFormChange = (patch: Partial<LegalDocData>) => setForm((p) => ({ ...p, ...patch }));
+
+  const handleFormSubmit = async () => {
+    setSubmitting(true);
+    try {
+      if (mode === "add") {
+        await createDocument({
+          ...form,
+          documentDate: toISODate(form.documentDate),
+        });
+        toast.success("Document created", { description: form.name });
+      } else if (mode === "edit" && current) {
+        await updateDocumentById(current.id, {
+          ...form,
+          documentDate: toISODate(form.documentDate),
+        });
+        toast.success("Document updated", { description: form.name });
+      }
+      await fetchData(true);
+    } catch (e: any) {
+      toast.error(mode === "add" ? "Create failed" : "Update failed", {
+        description: e?.message ?? "Unexpected error",
+      });
+      throw e;
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
     <div className="p-0 h-full flex flex-col">
       <Card className="shadow-sm flex flex-col h-full bg-white overflow-hidden">
-
-        {/* ---------- Sticky Header ---------- */}
         <CardHeader className="bg-white sticky top-0 z-20 ">
           <div className="flex items-center justify-between w-full gap-2">
             <h1 className="text-xl font-semibold">Legal Documents</h1>
-            <Button
-              size="sm"
-              variant="default"
-              className="h-8 px-3 flex items-center gap-2"
-              onClick={() => {
-                // TODO: open Add Hardware modal / navigate to add page
-              }}
-            >
+            <Button size="sm" variant="default" className="h-8 px-3 flex items-center gap-2" onClick={openAdd}>
               <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Add Legal Documents</span>
+              <span className="hidden sm:inline">Add Document</span>
             </Button>
           </div>
         </CardHeader>
 
-        {/* ---------- Scrollable Table Content ---------- */}
         <CardContent className="flex-1 overflow-y-auto px-4">
-          <LegalDocumentTable
-            legalDocuments={paginatedLegalDocuments}
-            onViewDetails={(item: any) => console.log("🟦 View:", item)}
-            // onEdit={(item: any) => console.log("🟩 Edit:", item)}
-            onDelete={(item: any) => console.log("🟥 Delete:", item)}
-          />
+          {loading ? (
+            <ShimmerTable rowCount={10} columnCount={6} />
+          ) : error ? (
+            <div className="text-sm text-red-600">{error}</div>
+          ) : (
+            <LegalDocumentTable
+              legalDocuments={Array.isArray(paginated) ? paginated : []}
+              onViewDetails={(item: LegalDoc) => openView(item)}
+              onEdit={(item: LegalDoc) => openEdit(item)}
+              onDelete={(item: LegalDoc) => requestDelete(item)}
+            />
+          )}
         </CardContent>
 
-        {/* ---------- Sticky Pagination At Bottom ---------- */}
         <div className="border-t bg-white sticky bottom-0 z-20 px-2">
           <TablePagination
             total={total}
@@ -157,6 +206,47 @@ const legalDocumentsDummy = [
           />
         </div>
       </Card>
+
+      <LegalDocumentDetailsDrawer open={drawerOpen} item={current} onClose={() => setDrawerOpen(false)} />
+
+      <LegalDocumentFormDialog
+        open={editDialogOpen}
+        mode={mode === "add" ? "add" : "edit"}
+        form={form}
+        onChange={onFormChange}
+        onSubmit={handleFormSubmit}
+        onClose={() => setEditDialogOpen(false)}
+        onDelete={mode === "edit" && current ? () => requestDelete(current) : undefined}
+        submitting={submitting}
+      />
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete document?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. It will permanently delete “{itemToDelete?.name}”.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary" size="sm" disabled={deleting}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button type="button" variant="destructive" size="sm" onClick={handleDeleteConfirmed} disabled={deleting}>
+              {deleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, LogOut, Settings, Users, UserPlus } from 'lucide-react';
+import { ChevronDown, ChevronUp, LogOut, Settings, Users } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -58,7 +58,7 @@ export default function ProfileMenu({ name = '', email, avatar, isCollapsed }: P
   // Collapsed (sidebar narrow) - avatar only (centered)
   if (isCollapsed) {
     return (
-      <div className="flex items-center justify-center pt-3">
+      <div className=" flex items-center justify-center pt-2 pb-2">
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger asChild>
             <Button
@@ -101,7 +101,7 @@ export default function ProfileMenu({ name = '', email, avatar, isCollapsed }: P
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       {/* keep trigger as a single child; place logout icon as a sibling */}
-      <div className="flex items-center w-full justify-between px-0 py-1 rounded-md">
+      <div className="flex items-center w-full justify-between px-0 py-1 rounded-md mx-0 mb-2">
         <DropdownMenuTrigger asChild>
           <Button
             className="flex items-center gap-3 flex-1 bg-transparent hover:bg-white/5 rounded-md justify-start"
@@ -110,13 +110,13 @@ export default function ProfileMenu({ name = '', email, avatar, isCollapsed }: P
             <div className="w-9 h-9 rounded-full overflow-hidden ring-1 ring-white/10">{Avatar}</div>
 
             <div className="flex-1 text-left">
-              <div className="text-xs font-semibold text-white leading-tight">{name}</div>
-              {email && <div className="text-[12px] text-gray-300">{email}</div>}
+              <div className="text-xs font-semibold text-gray-700 leading-tight">{name}</div>
+              {email && <div className="text-[12px] text-gray-500">{email}</div>}
             </div>
             {open ? (
-              <ChevronUp className="w-4 h-4 text-white/80" />
+              <ChevronUp className="w-4 h-4 text-gray-700/80" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-white/80" />
+              <ChevronDown className="w-4 h-4 text-gray-700/80" />
             )}
           </Button>
         </DropdownMenuTrigger>
@@ -140,10 +140,10 @@ export default function ProfileMenu({ name = '', email, avatar, isCollapsed }: P
               e.stopPropagation();
               handleLogout();
             }}
-            className="p-1 rounded-md hover:bg-white/10"
+            className="p-1 rounded-md hover:bg-white/10 pr-2"
             aria-label="Logout"
           >
-            <UserPlus className="w-4 h-4 text-white/80" />
+            <LogOut className="w-4 h-4 text-gray-700/80" />
           </button>
         </div>
       </div>

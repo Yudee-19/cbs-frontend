@@ -1,14 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from "@/components/ui/dialog";
+import CustomDialog from "@/components/ui/CustomDialog";
+import { DialogClose } from "@/components/ui/dialog";
 import type { HardwareData } from "@/services/itServices/HardwareServices";
 import { Loader2 } from "lucide-react";
 import {
@@ -81,172 +74,174 @@ export const HardwareFormDialog: React.FC<HardwareFormDialogProps> = ({
   onDelete,
   submitting = false,
 }) => {
+  const footer = (
+    <>
+      <Button form="hardware-form" type="submit" size="sm" disabled={submitting}>
+        {submitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {mode === "add" ? "Creating..." : "Updating..."}
+          </>
+        ) : mode === "add" ? (
+          "Create"
+        ) : (
+          "Update"
+        )}
+      </Button>
+
+      {mode === "edit" && onDelete && (
+        <Button type="button" size="sm" variant="destructive" onClick={onDelete} disabled={submitting}>
+          Delete
+        </Button>
+      )}
+
+      <DialogClose asChild>
+        <Button type="button" size="sm" variant="secondary" disabled={submitting} onClick={onClose}>
+          Close
+        </Button>
+      </DialogClose>
+    </>
+  );
+
   return (
-    <Dialog open={open} onOpenChange={(v) => (!v ? onClose() : null)}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {mode === "add" ? "Add Hardware" : `Edit: ${form.deviceName || ""}`}
-          </DialogTitle>
-          <DialogDescription>
-            {mode === "add" ? "Create a new hardware asset." : "Update hardware details."}
-          </DialogDescription>
-        </DialogHeader>
+    <CustomDialog
+      open={open}
+      onOpenChange={(v) => (!v ? onClose() : null)}
+      title={mode === "add" ? "Add Hardware" : `Edit: ${form.deviceName || ""}`}
+      description={mode === "add" ? "Create a new hardware asset." : "Update hardware details."}
+      footer={footer}
+    >
+      <form
+        id="hardware-form"
+        className="grid grid-cols-2 gap-4 text-sm"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await onSubmit();
+          onClose();
+        }}
+      >
+        {(Object.entries(FIELD_LABELS) as [FieldKey, string][]).map(([key, label]) => (
+          <div key={key} className="col-span-1">
+            <label className="block text-xs text-muted-foreground mb-1">{label}</label>
 
-        <form
-          className="grid grid-cols-2 gap-4 text-sm"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            await onSubmit();
-            onClose();
-          }}
-        >
-          {(Object.entries(FIELD_LABELS) as [FieldKey, string][]).map(([key, label]) => (
-            <div key={key} className="col-span-1">
-              <label className="block text-xs text-muted-foreground mb-1">{label}</label>
+            {key === "status" ||
+            key === "type" ||
+            key === "operatingSystem" ||
+            key === "ram" ||
+            key === "storage" ||
+            key === "department" ? (
+              <Select
+                value={(form as any)[key] ?? ""}
+                onValueChange={(v) => {
+                  const val = v === "__none" ? "" : v;
+                  onChange({ [key]: val } as Partial<HardwareData>);
+                }}
+                disabled={submitting}
+              >
+                <SelectTrigger size="sm">
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
 
-              {key === "status" ||
-              key === "type" ||
-              key === "operatingSystem" ||
-              key === "ram" ||
-              key === "storage" ||
-              key === "department" ? (
-                <Select
-                  value={(form as any)[key] ?? ""}
-                  onValueChange={(v) => {
-                    const val = v === "__none" ? "" : v;
-                    onChange({ [key]: val } as Partial<HardwareData>);
-                  }}
-                  disabled={submitting}
-                >
-                  <SelectTrigger size="sm">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
+                <SelectContent>
+                  {key === "type" &&
+                    TYPE_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
 
-                  <SelectContent>
-                    {key === "type" &&
-                      TYPE_OPTIONS.map((s) => (
+                  {key === "operatingSystem" &&
+                    OS_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+
+                  {key === "ram" && (
+                    <>
+                      <SelectItem key="__none_ram" value="__none">
+                        None
+                      </SelectItem>
+                      {RAM_OPTIONS.filter((s) => s !== "").map((s) => (
                         <SelectItem key={s} value={s}>
                           {s}
                         </SelectItem>
                       ))}
+                    </>
+                  )}
 
-                    {key === "operatingSystem" &&
-                      OS_OPTIONS.map((s) => (
+                  {key === "storage" && (
+                    <>
+                      <SelectItem key="__none_storage" value="__none">
+                        None
+                      </SelectItem>
+                      {STORAGE_OPTIONS.filter((s) => s !== "").map((s) => (
                         <SelectItem key={s} value={s}>
                           {s}
                         </SelectItem>
                       ))}
+                    </>
+                  )}
 
-                    {key === "ram" && (
-                      <>
-                        <SelectItem key="__none_ram" value="__none">
-                          None
-                        </SelectItem>
-                        {RAM_OPTIONS.filter((s) => s !== "").map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
-                          </SelectItem>
-                        ))}
-                      </>
-                    )}
-
-                    {key === "storage" && (
-                      <>
-                        <SelectItem key="__none_storage" value="__none">
-                          None
-                        </SelectItem>
-                        {STORAGE_OPTIONS.filter((s) => s !== "").map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
-                          </SelectItem>
-                        ))}
-                      </>
-                    )}
-
-                    {key === "department" && (
-                      <>
-                        <SelectItem key="__none_dept" value="__none">
-                          None
-                        </SelectItem>
-                        {DEPT_OPTIONS.filter((s) => s !== "").map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
-                          </SelectItem>
-                        ))}
-                      </>
-                    )}
-
-                    {key === "status" &&
-                      STATUS_OPTIONS.map((s) => (
+                  {key === "department" && (
+                    <>
+                      <SelectItem key="__none_dept" value="__none">
+                        None
+                      </SelectItem>
+                      {DEPT_OPTIONS.filter((s) => s !== "").map((s) => (
                         <SelectItem key={s} value={s}>
                           {s}
                         </SelectItem>
                       ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <input
-                  className="w-full border rounded px-2 py-1"
-                  value={(form as any)[key] || ""}
-                  onChange={(e) => onChange({ [key]: e.target.value } as Partial<HardwareData>)}
-                  required={REQUIRED_FIELDS.includes(key)}
-                  disabled={submitting}
-                />
-              )}
-            </div>
-          ))}
+                    </>
+                  )}
 
-          <div className="col-span-1">
-            <label className="block text-xs text-muted-foreground mb-1">Purchase Date</label>
-            <input
-              type="date"
-              className="w-full border rounded px-2 py-1"
-              value={form.purchaseDate ? form.purchaseDate.slice(0, 10) : ""}
-              onChange={(e) =>
-                onChange({ purchaseDate: new Date(e.target.value).toISOString() })
-              }
-              disabled={submitting}
-            />
-          </div>
-
-          <div className="col-span-1">
-            <label className="block text-xs text-muted-foreground mb-1">Warranty Expiry</label>
-            <input
-              type="date"
-              className="w-full border rounded px-2 py-1"
-              value={form.warrantyExpiry ? form.warrantyExpiry.slice(0, 10) : ""}
-              onChange={(e) =>
-                onChange({ warrantyExpiry: new Date(e.target.value).toISOString() })
-              }
-              disabled={submitting}
-            />
-          </div>
-
-          <DialogFooter className="col-span-2 flex gap-2 pt-2">
-            <Button type="submit" size="sm" disabled={submitting}>
-              {submitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {mode === "add" ? "Creating..." : "Updating..."}
-                </>
-              ) : (
-                mode === "add" ? "Create" : "Update"
-              )}
-            </Button>
-            {mode === "edit" && onDelete && (
-              <Button type="button" size="sm" variant="destructive" onClick={onDelete} disabled={submitting}>
-                Delete
-              </Button>
+                  {key === "status" &&
+                    STATUS_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <input
+                className="w-full border rounded px-2 py-1"
+                value={(form as any)[key] || ""}
+                onChange={(e) => onChange({ [key]: e.target.value } as Partial<HardwareData>)}
+                required={REQUIRED_FIELDS.includes(key)}
+                disabled={submitting}
+              />
             )}
-            <DialogClose asChild>
-              <Button type="button" size="sm" variant="secondary" disabled={submitting}>
-                Close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          </div>
+        ))}
+
+        <div className="col-span-1">
+          <label className="block text-xs text-muted-foreground mb-1">Purchase Date</label>
+          <input
+            type="date"
+            className="w-full border rounded px-2 py-1"
+            value={form.purchaseDate ? form.purchaseDate.slice(0, 10) : ""}
+            onChange={(e) =>
+              onChange({ purchaseDate: new Date(e.target.value).toISOString() })
+            }
+            disabled={submitting}
+          />
+        </div>
+
+        <div className="col-span-1">
+          <label className="block text-xs text-muted-foreground mb-1">Warranty Expiry</label>
+          <input
+            type="date"
+            className="w-full border rounded px-2 py-1"
+            value={form.warrantyExpiry ? form.warrantyExpiry.slice(0, 10) : ""}
+            onChange={(e) =>
+              onChange({ warrantyExpiry: new Date(e.target.value).toISOString() })
+            }
+            disabled={submitting}
+          />
+        </div>
+      </form>
+    </CustomDialog>
   );
 };

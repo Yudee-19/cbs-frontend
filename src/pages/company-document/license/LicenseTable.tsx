@@ -6,6 +6,7 @@ interface LicenseTableProps {
   licenses: any[];
   onViewDetails?: (item: any) => void;
   onEdit?: (item: any) => void;
+  onDownload?: (item: any) => void;
   onDelete?: (item: any) => void;
 }
 
@@ -13,7 +14,8 @@ const LicenseTable: React.FC<LicenseTableProps> = ({
   licenses,
   onViewDetails,
   onEdit,
-//   onDelete,
+  onDownload,
+  onDelete,
 }) => {
   return (
     <DataTable
@@ -24,7 +26,8 @@ const LicenseTable: React.FC<LicenseTableProps> = ({
       columns={getLicenseTableColumns(
         (item) => onViewDetails?.(item),
         (item) => onEdit?.(item),
-        // (item) => onDelete?.(item)
+        (item) => onDownload?.(item),
+        (item) => onDelete?.(item)
       )}
     />
   );

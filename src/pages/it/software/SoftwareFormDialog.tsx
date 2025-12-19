@@ -1,14 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from "@/components/ui/dialog";
+import CustomDialog from "@/components/ui/CustomDialog";
+import { DialogClose } from "@/components/ui/dialog";
 import type { SoftwareLicenseData } from "@/services/itServices/SoftwareLicenseServices";
 import { Loader2 } from "lucide-react";
 import {
@@ -46,30 +39,42 @@ export const SoftwareFormDialog: React.FC<Props> = ({
   onDelete,
   submitting = false,
 }) => {
+  const footer = (
+    <>
+      <Button form="software-form" type="submit" size="sm" disabled={submitting}>
+        {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{mode === "add" ? "Creating..." : "Updating..."}</> : (mode === "add" ? "Create" : "Update")}
+      </Button>
+      {mode === "edit" && onDelete && <Button type="button" size="sm" variant="destructive" onClick={onDelete} disabled={submitting}>Delete</Button>}
+      <DialogClose asChild>
+        <Button type="button" size="sm" variant="secondary" disabled={submitting} onClick={onClose}>Close</Button>
+      </DialogClose>
+    </>
+  );
+
   return (
-    <Dialog open={open} onOpenChange={(v) => (!v ? onClose() : null)}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{mode === "add" ? "Add Software" : `Edit: ${form.name || ""}`}</DialogTitle>
-          <DialogDescription>{mode === "add" ? "Create software license." : "Update software license."}</DialogDescription>
-        </DialogHeader>
+    <CustomDialog
+      open={open}
+      onOpenChange={(v) => (!v ? onClose() : null)}
+      title={mode === "add" ? "Add Software" : `Edit: ${form.name || ""}`}
+      description={mode === "add" ? "Create software license." : "Update software license."}
+      footer={footer}
+    >
+      <form id="software-form" className="grid grid-cols-2 gap-4 text-sm" onSubmit={async (e) => { e.preventDefault(); await onSubmit(); onClose(); }}>
+        <div>
+          <label className="block text-xs text-muted-foreground mb-1">Name</label>
+          <input className="w-full border rounded px-2 py-1" value={form.name || ""} onChange={(e) => onChange({ name: e.target.value })} required />
+        </div>
 
-        <form className="grid grid-cols-2 gap-4 text-sm" onSubmit={async (e) => { e.preventDefault(); await onSubmit(); onClose(); }}>
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1">Name</label>
-            <input className="w-full border rounded px-2 py-1" value={form.name || ""} onChange={(e) => onChange({ name: e.target.value })} required />
-          </div>
+        <div>
+          <label className="block text-xs text-muted-foreground mb-1">Vendor</label>
+          <input className="w-full border rounded px-2 py-1" value={form.vendor || ""} onChange={(e) => onChange({ vendor: e.target.value })} />
+        </div>
 
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1">Vendor</label>
-            <input className="w-full border rounded px-2 py-1" value={form.vendor || ""} onChange={(e) => onChange({ vendor: e.target.value })} />
-          </div>
-
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1">License Type</label>
-            <Select
-              value={form.licenseType ? String(form.licenseType) : "__none"}
-               onValueChange={(v) => onChange({ licenseType: v === "__none" ? "" : v })}
+        <div>
+          <label className="block text-xs text-muted-foreground mb-1">License Type</label>
+          <Select
+            value={form.licenseType ? String(form.licenseType) : "__none"}
+             onValueChange={(v) => onChange({ licenseType: v === "__none" ? "" : v })}
              >
                <SelectTrigger size="sm">
                  <SelectValue placeholder="Select" />
@@ -141,19 +146,8 @@ export const SoftwareFormDialog: React.FC<Props> = ({
               {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
-
-          <DialogFooter className="col-span-2 flex gap-2 pt-2">
-            <Button type="submit" size="sm" disabled={submitting}>
-              {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{mode === "add" ? "Creating..." : "Updating..."}</> : (mode === "add" ? "Create" : "Update")}
-            </Button>
-            {mode === "edit" && onDelete && <Button type="button" size="sm" variant="destructive" onClick={onDelete} disabled={submitting}>Delete</Button>}
-            <DialogClose asChild>
-              <Button type="button" size="sm" variant="secondary" disabled={submitting}>Close</Button>
-            </DialogClose>
-          </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </CustomDialog>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Eye, Download } from "lucide-react";
+import { Eye, Download, Pencil, Trash } from "lucide-react";
 import { ActionButtonWithTooltip } from "@/components/ui/actionButtonWithTooltip";
 
 export const getLicenseStatusBadge = (status: string) => {
@@ -28,55 +28,68 @@ export const getLicenseStatusBadge = (status: string) => {
   );
 };
 
-
 export const getLicenseTableColumns = (
   onView?: (row: any) => void,
-  onDownload?: (row: any) => void
+  onEdit?: (row: any) => void,
+  onDownload?: (row: any) => void,
+  onDelete?: (row: any) => void
 ) => [
-  {
-    key: "licenseName",
-    header: "License Name",
-  },
-  {
-    key: "licenseNumber",
-    header: "License Number",
-  },
-  {
-    key: "issueDate",
-    header: "Issue Date",
-  },
-  {
-    key: "expiryDate",
-    header: "Expiry Date",
-  },
-  {
-    key: "issuingAuthority",
-    header: "Issuing Authority",
-  },
-  {
-    key: "status",
-    header: "Status",
-    render: (row: any) => getLicenseStatusBadge(row.status),
-  },
-  {
-    key: "actions",
-    header: "Actions",
-    render: (row: any) => (
-      <div className="flex gap-2">
-        <ActionButtonWithTooltip
-          icon={<Eye size={18} />}
-          tooltip="View License"
-          onClick={() => onView?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded-md"
-        />
-
-        <ActionButtonWithTooltip
-          icon={<Download size={18} />}
-          tooltip="Download License"
-          onClick={() => onDownload?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-md"
-        />
-      </div>
-    ),
-  },
-];
+    {
+      key: "name",
+      header: "License Name",
+    },
+    {
+      key: "number",
+      header: "License Number",
+    },
+    {
+      key: "issueDate",
+      header: "Issue Date",
+    },
+    {
+      key: "expiryDate",
+      header: "Expiry Date",
+    },
+    {
+      key: "issuingAuthority",
+      header: "Issuing Authority",
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (row: any) => getLicenseStatusBadge(row.status),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      render: (row: any) => (
+        <div className="flex gap-2">
+          {false && <ActionButtonWithTooltip
+            icon={<Eye size={18} />}
+            tooltip="View License"
+            onClick={() => onView?.(row)}
+            colorClass="h-7 w-7 bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded-md"
+          />
+          }
+          <ActionButtonWithTooltip
+            icon={<Pencil size={18} />}
+            tooltip="Edit License"
+            onClick={() => onEdit?.(row)}
+            colorClass="h-7 w-7 bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded-md"
+          />
+           <ActionButtonWithTooltip
+            icon={<Trash size={18} />}
+            tooltip="Delete License"
+            onClick={() => onDelete?.(row)}
+            colorClass="h-7 w-7 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-md"
+          />
+          <ActionButtonWithTooltip
+            icon={<Download size={18} />}
+            tooltip="Download License"
+            onClick={() => onDownload?.(row)}
+            colorClass="h-7 w-7 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-md"
+          />
+        </div>
+      ),
+    },
+  ];
