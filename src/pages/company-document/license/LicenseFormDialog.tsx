@@ -196,7 +196,9 @@ export const LicenseFormDialog: React.FC<Props> = ({
                         Attachments
                     </label>
                     <FileUploader
-                        className={submitting ? "pointer-events-none opacity-50" : ""}
+                        className={
+                            submitting ? "pointer-events-none opacity-50" : ""
+                        }
                         acceptedTypes={[
                             "application/pdf",
                             "application/msword",
