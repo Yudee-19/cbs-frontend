@@ -78,8 +78,8 @@ export function SidebarMenu() {
           className={`flex items-center w-full p-3 rounded-lg transition justify-between cursor-pointer
             ${
               isChildActive
-                ? 'bg-primary text-white '
-                : 'text-white hover:text-white hover:bg-primary/50'
+                ? 'bg-primary text-gray-100 '
+                : 'text-gray-600 hover:text-gray-600 hover:bg-primary/50'
             }
             ${isCollapsed ? 'justify-center' : 'gap-3'}
           `}
@@ -105,7 +105,7 @@ export function SidebarMenu() {
         <div key={item.label} className="mb-1">
           {wrapWithTooltip(button, item.label, item.label)}
           {!isCollapsed && isOpen && (
-            <div className="mt-1 ">
+            <div className="mt-1 bg-gray-50">
               {item.children.map((child: any) => {
                 const childIsActive =
                   location.pathname === child.path ||
@@ -116,8 +116,8 @@ export function SidebarMenu() {
                     className={`flex items-center rounded-lg transition cursor-pointer text-xs 
                       ${
                         childIsActive
-                          ? 'text-white hover:bg-primary/50 bg-primary/50 '
-                          : 'text-white hover:text-white hover:bg-primary/50 mt-1 mb-1'
+                          ? 'text-gray-900 hover:bg-primary/50 bg-primary/50 '
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-primary/50 mt-1 mb-1'
                       }
                       ${isCollapsed ? 'justify-center' : 'gap-3'}
                     `}
@@ -147,8 +147,8 @@ export function SidebarMenu() {
         className={`flex items-center p-3 rounded-lg mb-1 transition cursor-pointer
           ${
             isActive
-              ? 'bg-primary text-white hover:bg-primary/50'
-              : 'text-white hover:text-white hover:bg-primary/50'
+              ? 'bg-primary text-gray-100 hover:bg-primary/50'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-primary/50'
           }
           ${isCollapsed ? 'justify-center' : 'gap-3'}
         `}
@@ -166,7 +166,7 @@ export function SidebarMenu() {
   };
 
   return (
-    <nav className="flex flex-col p-2 bg-sidebar-primary ">
+    <nav className="flex flex-col p-2  ">
       <TooltipProvider delayDuration={200}>
         {menuItems.map((item: any) => renderMenuItem(item))}
       </TooltipProvider>
