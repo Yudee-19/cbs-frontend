@@ -46,39 +46,58 @@ const ChequePrintingPage = () => {
   }, [dataWithId, page, rowsPerPage]);
 
   return (
-    <div className="p-0 h-full flex flex-col">
+    <div className="p-2 sm:p-4 h-full flex flex-col">
       <Card className="shadow-sm flex flex-col h-full bg-white overflow-hidden">
         <CardHeader className="bg-white sticky top-0 z-20">
-          <div className="flex items-center justify-between w-full gap-2">
-            <h1 className="text-xl font-semibold">Cheque Printing</h1>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-2 sm:gap-3">
+            <h1 className="text-lg sm:text-xl font-semibold">Cheque Printing</h1>
 
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => console.log("Open Business Contacts")}>
-                <Users />
-                <span>Business Contacts</span>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end sm:justify-normal">
+              <Button
+                variant="outline"
+                size="sm"
+                aria-label="Business Contacts"
+                title="Business Contacts"
+                onClick={() => console.log("Open Business Contacts")}
+              >
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Business Contacts</span>
               </Button>
-              <Button size="sm" onClick={() => console.log("New Cheque")}>
-                <Plus />
-                <span>New Cheque</span>
+              <Button
+                size="sm"
+                aria-label="New Cheque"
+                title="New Cheque"
+                onClick={() => console.log("New Cheque")}
+              >
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">New Cheque</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={() => console.log("Open Cheque Manager")}>
-                <List />
-                <span>Cheque Manager</span>
+              <Button
+                variant="outline"
+                size="sm"
+                aria-label="Cheque Manager"
+                title="Cheque Manager"
+                onClick={() => console.log("Open Cheque Manager")}
+              >
+                <List className="h-4 w-4" />
+                <span className="hidden sm:inline">Cheque Manager</span>
               </Button>
             </div>
           </div>
         </CardHeader>
 
-        <CardContent className="flex-1 overflow-hidden px-4">
+        <CardContent className="flex-1 overflow-hidden px-2 sm:px-4">
+          <div className="overflow-x-auto h-full">
             <ChequeReportTable
               chequeReports={paginated}
               onPrint={(row) => {
                 console.log("Print cheque:", row.chequeNo);
               }}
             />
+          </div>
         </CardContent>
 
-        <div className="border-t bg-white sticky bottom-0 z-20 px-2">
+        <div className="border-t bg-white sticky bottom-0 z-20 px-2 sm:px-4">
           <TablePagination
             total={total}
             page={page}
