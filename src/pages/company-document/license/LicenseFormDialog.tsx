@@ -2,9 +2,9 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import CustomDialog from "@/components/ui/CustomDialog";
 import { DialogClose } from "@/components/ui/dialog";
-import { FileUploader } from "@/components/ui/fileUploader";
 import { type LicenseData } from "@/services/company-documents/LicensesServices";
 import { Loader2 } from "lucide-react";
+import { FileUploader } from "@/components/ui/FileUploader";
 
 type Mode = "add" | "edit";
 
