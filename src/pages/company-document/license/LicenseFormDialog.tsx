@@ -2,9 +2,9 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import CustomDialog from "@/components/ui/CustomDialog";
 import { DialogClose } from "@/components/ui/dialog";
-import type { LicenseData } from "@/services/company-documents/licensesServices";
+import { FileUploader } from "@/components/ui/fileUploader";
+import { type LicenseData } from "@/services/company-documents/LicensesServices";
 import { Loader2 } from "lucide-react";
-import { FileUploader } from "@/components/ui/FileUploader";
 
 type Mode = "add" | "edit";
 
@@ -191,17 +191,27 @@ export const LicenseFormDialog: React.FC<Props> = ({
                     />
                 </div>
                 {/* File Uploader Integration */}
-                <div className="col-span-2 mt-2">
-                    <label className="block text-xs text-muted-foreground mb-2">
+                <div className="col-span-2">
+                    <label className="block text-xs text-muted-foreground mb-1">
                         Attachments
                     </label>
                     <FileUploader
+                        className={submitting ? "pointer-events-none opacity-50" : ""}
+                        acceptedTypes={[
+                            "application/pdf",
+                            "application/msword",
+                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        ]}
+                        maxFiles={1}
+                        maxSizeMB={50}
                         onFilesChanged={(files) => {
-                            // TODO: Update your form state or prepare files for upload here
-                            console.log("Selected files:", files);
-                            // Example: onChange({ attachments: files } as any);
+                            const first = files[0];
+                            onChange({ fileKey: first ? first.name : "" });
                         }}
                     />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        Selected: {form.fileKey || "None"}
+                    </p>
                 </div>
             </form>
         </CustomDialog>

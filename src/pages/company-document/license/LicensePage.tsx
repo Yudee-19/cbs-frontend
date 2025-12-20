@@ -13,7 +13,7 @@ import {
   deleteLicense,
   type License,
   type LicenseData,
-} from "@/services/company-documents/licensesServices";
+} from "@/services/company-documents/LicensesServices";
 import { LicenseFormDialog } from "./LicenseFormDialog";
 import { LicenseDetailsDrawer } from "./LicenseDetailsDrawer";
 import {

@@ -13,7 +13,7 @@ import {
   deleteDocument,
   type LegalDoc,
   type LegalDocData,
-} from "@/services/company-documents/legalDocServices";
+} from "@/services/company-documents/LegalDocServices";
 import { LegalDocumentFormDialog } from "./LegalDocumentFormDialog";
 import { LegalDocumentDetailsDrawer } from "./LegalDocumentDetailsDrawer";
 import {

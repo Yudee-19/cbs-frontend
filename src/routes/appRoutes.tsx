@@ -39,6 +39,7 @@ const LicensePage = lazy(() => import('@/pages/company-document/license/LicenseP
 const LegalDocumentPage = lazy(() => import('@/pages/company-document/legal-document/LegalDocumentPage'));
 const AduitReportPage = lazy(() => import('@/pages/company-document/aduit-report/AduitReportPage'));
 const ISOCertificationsPage = lazy(() => import('@/pages/company-document/iso-certifications/ISOCertificationsPage'));
+const ChequePrintingPage = lazy(()=> import('@/pages/banking/ChequePrintingPage'));
 
 export const router = createBrowserRouter([
   {
@@ -49,15 +50,31 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
     children: [
+      {
+        path:'/', element: <Navigate to="/dashboard" replace />
+      },
       { path: '/dashboard', element: <div>Dashboard Content</div> },
       {
         path: 'assets', element: <Navigate to="/assets/land-building" replace />,
       },
+      
       {
         path : '/my-attendance', element: <div>My Attendance Page</div>
       },
       {
         path : '/leave-application', element: <div>Leave Application Page</div>
+      },
+      {
+        path :'/banking', element: <Navigate to="/banking/cheque-printing" replace />
+      },
+      {
+        path : '/banking/cheque-printing',
+        element: 
+        (
+          <Suspense fallback={<LoadingFallback />}>
+            <ChequePrintingPage />
+          </Suspense>
+        )
       },
       {
         path: '/assets/vehicle',
@@ -110,6 +127,7 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
+     
        {
         path: '/docs/iso', // becomes /it/software
         element: (

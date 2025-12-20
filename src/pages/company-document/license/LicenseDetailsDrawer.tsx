@@ -7,7 +7,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
-import type { License } from "@/services/company-documents/licensesServices";
+import { type License } from "@/services/company-documents/LicensesServices";
 import { X } from "lucide-react";
 
 interface Props {

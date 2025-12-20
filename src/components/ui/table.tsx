@@ -46,12 +46,12 @@ function DataTable<T extends { id: string }>({
     >
       <table
         data-slot="table"
-        className="min-w-[70vh] w-full text-xs text-left"
+        className="min-w-[70vh] w-full text-xs text-left border-separate border-spacing-y-3 border-spacing-x-0"
       >
-        <thead className="sticky top-0 z-10 bg-[#FAFAFA] border-b border-gray-200">
-          <tr className=" hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors ">
+        <thead className="sticky top-0 z-10  border-b border-gray-200">
+          <tr className="data-[state=selected]:bg-muted border-b bg-primary text-white ">
             {enableSelection && (
-              <th className="p-2 pl-5  h-10 text-left table-10px align-middle whitespace-nowrap font-semibold text-[#1E1E1E]">
+              <th className="p-2 pl-5  h-10 text-left table-10px align-middle whitespace-nowrap font-semibold first:rounded-l-sm last:rounded-r-sm ">
                 <Checkbox
                   checked={
                     allSelected ? true : someSelected ? 'indeterminate' : false
@@ -63,7 +63,7 @@ function DataTable<T extends { id: string }>({
             {columns.map((col) => (
               <th
                 key={col.key.toString()}
-                className={`p-2 pl-5 h-10 table-10px align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-xs ${col.key === 'id' || col.key === 'userId' ? 'font-bold text-gray-900' : 'font-semibold text-[#1E1E1E]'} ${col.key === 'status'? ' text-center' : 'text-left'} cursor-pointer` }
+                className={`p-2 pl-5 h-10 table-10px align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-xs ${col.key === 'id' || col.key === 'userId' ? 'font-bold ' : 'font-semibold '} text-center cursor-pointer first:rounded-l-sm last:rounded-r-sm` }
               >
                 {col.header}
               </th>
@@ -85,11 +85,11 @@ function DataTable<T extends { id: string }>({
             data.map((row) => (
               <tr
                 key={row.id}
-                className="hover:bg-gray-50 cursor-pointer bg-white"
+                className="cursor-pointer bg-white hover:bg-gray-50"
                 onClick={() => onRowClick?.(row)}
               >
                 {enableSelection && (
-                  <td className="p-2 pl-5 border-b">
+                  <td className="px-4 py-4 first:border-l border-y last:border-r border-gray-200 first:rounded-l-sm last:rounded-r-sm">
                     <Checkbox
                       checked={selected.includes(row.id)}
                       onCheckedChange={() => toggleRow(row.id)}
@@ -99,13 +99,9 @@ function DataTable<T extends { id: string }>({
                 {columns.map((col) => (
                   <td
                     key={col.key.toString()}
-                    className={`p-2 pl-5 whitespace-nowrap border-b hover:bg-gray-50${
+                    className={`px-4 py-4 whitespace-nowrap first:border-l border-y last:border-r border-gray-200 first:rounded-l-sm last:rounded-r-sm ${
                       col.cellClassName ? col.cellClassName(row) : ''
-                    } ${columnStyles?.[col.key.toString()] || 'text-gray-500'}${
-                      (col.key === 'status')
-                        ? ' text-center'
-                        : ''
-                    }`}
+                    } ${columnStyles?.[col.key.toString()] || 'text-gray-500'} text-center`}
                     data-slot="table-cell"
                   >
                     {col.render

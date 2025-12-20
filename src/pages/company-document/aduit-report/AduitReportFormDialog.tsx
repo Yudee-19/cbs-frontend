@@ -4,6 +4,7 @@ import CustomDialog from "@/components/ui/CustomDialog";
 import { DialogClose } from "@/components/ui/dialog";
 import type { AuditData } from "@/services/company-documents/AuditServices";
 import { Loader2 } from "lucide-react";
+import { FileUploader } from "@/components/ui/fileUploader";
 
 type Mode = "add" | "edit";
 
@@ -139,13 +140,20 @@ export const AduitReportFormDialog: React.FC<Props> = ({
         </div>
 
         <div className="col-span-2">
-          <label className="block text-xs text-muted-foreground mb-1">File Key (optional)</label>
-          <input
-            className="w-full border rounded px-2 py-1"
-            value={form.fileKey || ""}
-            onChange={(e) => onChange({ fileKey: e.target.value })}
-            disabled={submitting}
-            placeholder="ims/private/..."
+          <label className="block text-xs text-muted-foreground mb-1">Attachments</label>
+          <FileUploader
+            className={submitting ? "pointer-events-none opacity-50" : ""}
+            acceptedTypes={[
+              "application/pdf",
+              "application/msword",
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ]}
+            maxFiles={5}
+            maxSizeMB={50}
+            onFilesChanged={(files) => {
+              // Map first file to fileKey for now; integrate upload to get a real key.
+              onChange({ fileKey: files[0]?.name ?? "" });
+            }}
           />
         </div>
       </form>

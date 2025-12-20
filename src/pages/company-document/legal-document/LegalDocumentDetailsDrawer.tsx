@@ -7,7 +7,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
-import type { LegalDoc } from "@/services/company-documents/legalDocServices";
+import type { LegalDoc } from "@/services/company-documents/LegalDocServices";
 import { X } from "lucide-react";
 
 interface Props {
