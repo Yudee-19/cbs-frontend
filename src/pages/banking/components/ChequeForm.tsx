@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import type { ChequeFormData } from "../NewChequePage";
 import { BANK_OPTIONS } from "../NewChequePage";
+import { isValidPayeeName, isValidAmount } from "../utils/utils";
 
 interface ChequeFormProps {
   formData: ChequeFormData;
@@ -38,13 +39,13 @@ const ChequeForm = ({
 
   const handleGeneratePreviewClick = () => {
     // Validate payee name
-    if (!formData.payeeName || formData.payeeName.trim().length === 0) {
+    if (!isValidPayeeName(formData.payeeName)) {
       toast.error("Enter valid payee name");
       return;
     }
 
     // Validate amount
-    if (!formData.amount || parseFloat(formData.amount) === 0) {
+    if (!isValidAmount(formData.amount)) {
       toast.error("Enter valid amount");
       return;
     }
