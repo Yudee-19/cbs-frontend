@@ -1,9 +1,9 @@
-import { Calendar } from "lucide-react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioButton } from "@/components/ui/radio-button";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -32,15 +32,31 @@ const ChequeForm = ({ formData, onInputChange, onGeneratePreview }: ChequeFormPr
     }
   };
 
+  const handleGeneratePreviewClick = () => {
+    // Validate payee name
+    if (!formData.payeeName || formData.payeeName.trim().length === 0) {
+      toast.error("Enter valid payee name");
+      return;
+    }
+
+    // Validate amount
+    if (!formData.amount || parseFloat(formData.amount) === 0) {
+      toast.error("Enter valid amount");
+      return;
+    }
+
+    onGeneratePreview();
+  };
+
   return (
     <div>
       <h2 className="text-lg font-semibold mb-6">Cheque Details</h2>
 
       {/* Bank / Business Contact */}
       <div className="mb-6">
-        <Label className="text-sm text-gray-600 mb-2 block">
+        <label className="block text-xs text-muted-foreground mb-1">
           Select Bank / Business Contact
-        </Label>
+        </label>
         <Select value={formData.bank} onValueChange={handleBankChange}>
           <SelectTrigger className="w-full bg-gray-50 shadow-none">
             <SelectValue placeholder="Select bank" />
@@ -77,19 +93,19 @@ const ChequeForm = ({ formData, onInputChange, onGeneratePreview }: ChequeFormPr
 
       {/* Payee Name */}
       <div className="mb-6">
-        <Label className="text-sm text-gray-600 mb-2 block">Payee Name</Label>
+        <label className="block text-xs text-muted-foreground mb-1">Payee Name</label>
         <Input
           type="text"
           placeholder="Enter payee name"
           value={formData.payeeName}
           onChange={(e) => onInputChange("payeeName", e.target.value)}
-          className="w-full bg-gray-50 shadow-none"
+          className="w-full bg-gray-50 shadow-none placeholder:text-gray-700"
         />
       </div>
 
       {/* Amount */}
       <div className="mb-6">
-        <Label className="text-sm text-gray-600 mb-2 block">Amount</Label>
+        <label className="block text-xs text-muted-foreground mb-1">Amount</label>
         <div className="flex gap-2">
           <div className="flex items-center px-3 bg-gray-50 rounded-md border border-input">
             <span className="text-gray-600 font-medium">$</span>
@@ -99,51 +115,25 @@ const ChequeForm = ({ formData, onInputChange, onGeneratePreview }: ChequeFormPr
             placeholder="12,345.56"
             value={formData.amount}
             onChange={(e) => onInputChange("amount", e.target.value)}
-            className="flex-1 bg-gray-50 shadow-none"
+            className="flex-1 bg-gray-50 shadow-none placeholder:text-gray-700"
           />
         </div>
       </div>
 
       {/* Date */}
       <div className="mb-6">
-        <Label className="text-sm text-gray-600 mb-2 block">Date</Label>
-        <div className="relative">
-          <Input
-            type="date"
-            value={formData.date}
-            onChange={(e) => onInputChange("date", e.target.value)}
-            className="w-full pr-10 [&::-webkit-calendar-picker-indicator]:hidden bg-gray-50 shadow-none"
-          />
-          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-        </div>
-      </div>
-
-      {/* Days Present Toggle */}
-      <div className="mb-8">
-        <Label className="text-sm text-gray-600 mb-3 block">Date</Label>
-        <RadioGroupPrimitive.Root
-          value={formData.daysPresent ? "yes" : "no"}
-          onValueChange={(value) => onInputChange("daysPresent", value === "yes")}
-          className="flex gap-6"
-        >
-          <div className="flex items-center gap-2">
-            <RadioButton id="days-present-no" value="no" />
-            <Label htmlFor="days-present-no" className="text-sm cursor-pointer">
-              Days not Present
-            </Label>
-          </div>
-          <div className="flex items-center gap-2">
-            <RadioButton id="days-present-yes" value="yes" />
-            <Label htmlFor="days-present-yes" className="text-sm cursor-pointer">
-              Days Present
-            </Label>
-          </div>
-        </RadioGroupPrimitive.Root>
+        <label className="block text-xs text-muted-foreground mb-1">Date</label>
+        <input
+          type="date"
+          value={formData.date}
+          onChange={(e) => onInputChange("date", e.target.value)}
+          className="w-full border rounded-lg px-2 py-2 bg-gray-50"
+        />
       </div>
 
       {/* Orientation */}
       <div className="mb-8">
-        <Label className="text-sm text-gray-600 mb-3 block">Orientation</Label>
+        <label className="block text-xs text-muted-foreground mb-3">Orientation</label>
         <RadioGroupPrimitive.Root
           value={formData.orientation}
           onValueChange={(value) => onInputChange("orientation", value)}
@@ -166,7 +156,7 @@ const ChequeForm = ({ formData, onInputChange, onGeneratePreview }: ChequeFormPr
 
       {/* Generate Preview Button */}
       <Button
-        onClick={onGeneratePreview}
+        onClick={handleGeneratePreviewClick}
         className="w-full bg-primary hover:bg-blue-700 text-white font-medium py-2 rounded-lg"
       >
         Generate Preview

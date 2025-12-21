@@ -16,7 +16,6 @@ export interface ChequeFormData {
   payeeName: string;
   amount: string;
   date: string;
-  daysPresent: boolean;
   orientation: "horizontal" | "vertical";
 }
 
@@ -39,7 +38,6 @@ export const defaultChequeFormData: ChequeFormData = {
   payeeName: "",
   amount: "",
   date: new Date().toISOString().split("T")[0],
-  daysPresent: false,
   orientation: "horizontal",
 };
 
@@ -72,8 +70,8 @@ export const BANK_OPTIONS: BankOption[] = [
 
 const NewChequePage = () => {
     const navigate = useNavigate();
-    const [showPreview, setShowPreview] = useState(false);
     const [formData, setFormData] = useState<ChequeFormData>(defaultChequeFormData);
+    const [previewData, setPreviewData] = useState<ChequeFormData>(defaultChequeFormData);
 
     const handleBack = () => navigate("/banking/cheque-printing");
 
@@ -81,10 +79,12 @@ const NewChequePage = () => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleGeneratePreview = () => setShowPreview(true);
+    const handleGeneratePreview = () => {
+        setPreviewData(formData);
+    };
 
     return (
-        <div className="p-2 sm:p-4 h-full w-full flex flex-col gap-4">
+        <div className="p-2 sm:p-4 h-full w-full flex flex-col gap-4 overflow-x-auto">
             {/* Header */}
             {/* <header className="flex items-center gap-3">
                 <Button variant="ghost" size="sm" onClick={handleBack} className="h-8 w-8 p-0">
@@ -96,7 +96,7 @@ const NewChequePage = () => {
             {/* Main Content */}
             <div className="grid grid-cols-2 gap-6 h-auto" style={{ gridTemplateColumns: '1fr 1fr' }}>
                 {/* Form Section */}
-                <Card className="shadow-sm flex flex-col bg-white min-w-[500px] pt-0 pb-0 shadow-none">
+                <Card className="shadow-sm flex flex-col bg-white min-w-[550px] pt-0 pb-0 shadow-none">
                     <CardContent className="h-auto p-6">
                         <ChequeForm
                             formData={formData}
@@ -107,9 +107,9 @@ const NewChequePage = () => {
                 </Card>
 
                 {/* Preview Section */}
-                <Card className="shadow-sm flex flex-col bg-white min-w-[500px] pt-0 pb-0 shadow-none">
+                <Card className="shadow-sm flex flex-col bg-white min-w-[550px] pt-0 pb-0 shadow-none">
                     <CardContent className="h-auto p-6">
-                        <ChequePreview formData={formData} showPreview={showPreview} />
+                        <ChequePreview formData={previewData} />
                     </CardContent>
                 </Card>
             </div>

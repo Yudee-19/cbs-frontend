@@ -65,7 +65,6 @@ export const menuItems: MenuItem[] = [
     icon: Wallet,
     children: [
       { id: "cheque", label: "Cheque Printing", icon: ReceiptText, path: "/banking/cheque-printing" , title: "Banking", subtitle:"user/Banking/Cheque Printing"},
-      { id: "new-cheque", label: "New Cheque", icon: ReceiptText, path: "/banking/cheque-printing/new-cheque" , title: "Banking", subtitle:"user/Banking/New Cheque"},
       { id: "telex", label: "Telex Transfer", icon: FileText, path: "/banking/telex-transfer" ,title: "Banking", subtitle:"user/Banking/Telex Transfer" },
       { id: "cashflow", label: "Cash Flow Forecast", icon: FileSpreadsheet, path: "/banking/cash-flow", title: "Banking", subtitle:"user/Banking/Cash Flow Forecast" },
       { id: "daily-balance", label: "Daily Bank Balance", icon: Landmark, path: "/banking/daily-bank-balance",title: "Banking", subtitle:"user/Banking/Daily Bank Balance" },

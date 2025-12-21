@@ -88,8 +88,8 @@ const ChequePrintingPage = () => {
           </div>
         </CardHeader>
 
-        <CardContent className="flex-1 overflow-hidden px-2 sm:px-4">
-          <div className="overflow-x-auto h-full">
+        <CardContent className="flex-1 overflow-hidden p-0">
+          <div className="overflow-x-auto h-full px-2 sm:px-4">
             <ChequeReportTable
               chequeReports={paginated}
               onPrint={(row) => {
