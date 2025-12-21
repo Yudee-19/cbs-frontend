@@ -1,8 +1,10 @@
 import { useState, useRef } from "react";
 import { useDrop } from "react-dnd";
+import { Button } from "@/components/ui/button";
 import type { ChequeFormData } from "../NewChequePage";
 import chequeImage from "@/assets/cheque.png";
 import DraggableField from "./DraggableField";
+import { printCheque } from "../utils/utils";
 
 interface ChequePreviewProps {
   formData: ChequeFormData;
@@ -56,10 +58,27 @@ const ChequePreview = ({ formData }: ChequePreviewProps): React.ReactNode => {
   // Only show fields if formData has values
   const showFields = formData.payeeName && formData.amount && formData.date;
 
+  const handlePrintCheque = () => {
+    if (!chequeRef.current) return;
+
+    const imgElement = chequeRef.current.querySelector('img') as HTMLImageElement | null;
+    
+    printCheque({
+      imgElement,
+      formData: {
+        date: formData.date,
+        payeeName: formData.payeeName,
+        amount: formData.amount,
+        amountInWords: formData.amountInWords,
+      },
+      fieldPositions,
+    });
+  };
+
   return (
-    <div>
-      <h2 className="text-lg font-semibold mb-6">Preview</h2>
-      <div className={`flex justify-center items-center overflow-visible ${isVertical ? "py-8" : ""}`}>
+    <div className="flex flex-col gap-4 h-full">
+      <h2 className="text-lg font-semibold">Preview</h2>
+      <div className={`flex justify-start items-start overflow-visible flex-1 ${isVertical ? "py-8" : ""}`}>
         <div
           ref={(node) => {
             drop(node);
@@ -107,6 +126,16 @@ const ChequePreview = ({ formData }: ChequePreviewProps): React.ReactNode => {
           )}
         </div>
       </div>
+
+      {/* Print Cheque Button - At Bottom */}
+      {showFields && (
+        <Button
+          onClick={handlePrintCheque}
+          className="w-full bg-primary text-white font-medium py-2 rounded-lg"
+        >
+          Print Cheque
+        </Button>
+      )}
     </div>
   );
 };
