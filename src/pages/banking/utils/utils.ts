@@ -163,6 +163,9 @@ export const printCheque = ({
               padding: 0;
               box-shadow: none;
             }
+            .cheque-img {
+              display: none;
+            }
           }
         </style>
       </head>
