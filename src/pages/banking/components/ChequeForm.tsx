@@ -20,7 +20,11 @@ interface ChequeFormProps {
   onGeneratePreview: () => void;
 }
 
-const ChequeForm = ({ formData, onInputChange, onGeneratePreview }: ChequeFormProps) => {
+const ChequeForm = ({ 
+  formData, 
+  onInputChange, 
+  onGeneratePreview,
+}: ChequeFormProps) => {
   const handleBankChange = (bankId: string) => {
     const selectedBank = BANK_OPTIONS.find((bank) => bank.id === bankId);
     if (selectedBank) {
@@ -108,7 +112,7 @@ const ChequeForm = ({ formData, onInputChange, onGeneratePreview }: ChequeFormPr
         <label className="block text-xs text-muted-foreground mb-1">Amount</label>
         <div className="flex gap-2">
           <div className="flex items-center px-3 bg-gray-50 rounded-md border border-input">
-            <span className="text-gray-600 font-medium">$</span>
+            <span className="text-gray-600 font-medium">{formData.currency}</span>
           </div>
           <Input
             type="number"

@@ -1,10 +1,10 @@
 import { useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import ChequeForm from "./components/ChequeForm";
 import ChequePreview from "./components/ChequePreview";
+import { convertAmountToWordsWithDecimals } from "../../lib/utils";
 
 // Types
 export interface ChequeFormData {
@@ -15,6 +15,7 @@ export interface ChequeFormData {
   currency: string;
   payeeName: string;
   amount: string;
+  amountInWords: string;
   date: string;
   orientation: "horizontal" | "vertical";
 }
@@ -37,6 +38,7 @@ export const defaultChequeFormData: ChequeFormData = {
   currency: "USD",
   payeeName: "",
   amount: "",
+  amountInWords: "",
   date: new Date().toISOString().split("T")[0],
   orientation: "horizontal",
 };
@@ -69,51 +71,46 @@ export const BANK_OPTIONS: BankOption[] = [
 ];
 
 const NewChequePage = () => {
-    const navigate = useNavigate();
     const [formData, setFormData] = useState<ChequeFormData>(defaultChequeFormData);
     const [previewData, setPreviewData] = useState<ChequeFormData>(defaultChequeFormData);
-
-    const handleBack = () => navigate("/banking/cheque-printing");
 
     const handleInputChange = (field: keyof ChequeFormData, value: unknown) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
     const handleGeneratePreview = () => {
-        setPreviewData(formData);
+        const amountInWords = convertAmountToWordsWithDecimals(formData.amount, formData.currency);
+        const updatedData = { ...formData, amountInWords };
+        setFormData(updatedData);
+        setPreviewData(updatedData);
     };
 
     return (
-        <div className="p-2 sm:p-4 h-full w-full flex flex-col gap-4 overflow-x-auto">
-            {/* Header */}
-            {/* <header className="flex items-center gap-3">
-                <Button variant="ghost" size="sm" onClick={handleBack} className="h-8 w-8 p-0">
-                    <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <h1 className="text-lg sm:text-xl font-semibold">New Cheque</h1>
-            </header> */}
+        <DndProvider backend={HTML5Backend}>
+            <div className="p-2 sm:p-4 h-full w-full flex flex-col gap-4 overflow-x-auto">
 
-            {/* Main Content */}
-            <div className="grid grid-cols-2 gap-6 h-auto" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                {/* Form Section */}
-                <Card className="shadow-sm flex flex-col bg-white min-w-[550px] pt-0 pb-0 shadow-none">
-                    <CardContent className="h-auto p-6">
-                        <ChequeForm
-                            formData={formData}
-                            onInputChange={handleInputChange}
-                            onGeneratePreview={handleGeneratePreview}
-                        />
-                    </CardContent>
-                </Card>
+                {/* Main Content */}
+                <div className="grid grid-cols-2 gap-6 h-auto" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                    {/* Form Section */}
+                    <Card className="shadow-sm flex flex-col bg-white min-w-[550px] pt-0 pb-0 shadow-none">
+                        <CardContent className="h-auto p-6">
+                            <ChequeForm
+                                formData={formData}
+                                onInputChange={handleInputChange}
+                                onGeneratePreview={handleGeneratePreview}
+                            />
+                        </CardContent>
+                    </Card>
 
-                {/* Preview Section */}
-                <Card className="shadow-sm flex flex-col bg-white min-w-[550px] pt-0 pb-0 shadow-none">
-                    <CardContent className="h-auto p-6">
-                        <ChequePreview formData={previewData} />
-                    </CardContent>
-                </Card>
+                    {/* Preview Section */}
+                    <Card className="shadow-sm flex flex-col bg-white min-w-[550px] pt-0 pb-0 shadow-none">
+                        <CardContent className="h-auto p-6">
+                            <ChequePreview formData={previewData} />
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
-        </div>
+        </DndProvider>
     );
 };
 
