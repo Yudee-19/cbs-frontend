@@ -1,4 +1,3 @@
-// Cheque Form Data Types
 export interface ChequeFormData {
   bank: string;
   branch: string;
@@ -12,7 +11,6 @@ export interface ChequeFormData {
   orientation: "horizontal" | "vertical";
 }
 
-// Field Position Types
 export interface FieldPosition {
   x: number;
   y: number;
@@ -25,7 +23,6 @@ export interface FieldPositions {
   date: FieldPosition;
 }
 
-// Bank Option Type
 export interface BankOption {
   id: string;
   name: string;
@@ -35,7 +32,6 @@ export interface BankOption {
   currency: string;
 }
 
-// Component Props Types
 export interface ChequeFormProps {
   formData: ChequeFormData;
   onInputChange: (field: keyof ChequeFormData, value: unknown) => void;
@@ -55,7 +51,6 @@ export interface DraggableFieldProps {
   isVertical?: boolean;
 }
 
-// Print Cheque Params Type
 export interface PrintChequeParams {
   imgElement: HTMLImageElement | null;
   formData: {

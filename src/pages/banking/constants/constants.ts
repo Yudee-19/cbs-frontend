@@ -1,6 +1,6 @@
 import type { ChequeFormData, BankOption, FieldPositions } from "../types/types";
 
-// Default Cheque Form Data
+// Dummy cheque data - REPLACE THIS AFTER BE INTEGRATION
 export const defaultChequeFormData: ChequeFormData = {
   bank: "burgan-bank",
   branch: "Farwaniya Branch - 239",
@@ -14,7 +14,7 @@ export const defaultChequeFormData: ChequeFormData = {
   orientation: "horizontal",
 };
 
-// Bank Options
+// Dummy bank data - REPLACE THIS AFTER BE INTEGRATION
 export const BANK_OPTIONS: BankOption[] = [
   {
     id: "burgan-bank",

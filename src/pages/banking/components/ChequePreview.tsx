@@ -16,11 +16,9 @@ const ChequePreview = ({ formData, fieldPositions, onFieldPositionsChange }: Che
     drop: (item: any, monitor: any) => {
       const delta = monitor.getDifferenceFromInitialOffset();
       if (delta && chequeRef.current) {
-        // No coordinate transformation needed - text and image are already in correct orientation
         const newX = Math.round(item.position.x + delta.x);
         const newY = Math.round(item.position.y + delta.y);
         
-        // Update position for the specific field
         onFieldPositionsChange({
           ...fieldPositions,
           [item.id]: { x: newX, y: newY },
@@ -32,7 +30,6 @@ const ChequePreview = ({ formData, fieldPositions, onFieldPositionsChange }: Che
     }),
   });
 
-  // Only show fields if formData has values
   const showFields = formData.payeeName && formData.amount && formData.date;
 
   const handlePrintCheque = () => {
@@ -108,7 +105,6 @@ const ChequePreview = ({ formData, fieldPositions, onFieldPositionsChange }: Che
         </div>
       </div>
 
-      {/* Print Cheque Button - At Bottom */}
       {showFields && (
         <Button
           onClick={handlePrintCheque}

@@ -17,13 +17,10 @@ const DraggableField = ({ id, text, position, isVertical = false }: DraggableFie
         position: 'absolute',
         left: position.x,
         top: position.y,
-        cursor: 'move',
         opacity: isDragging ? 0.5 : 1,
-        userSelect: 'none',
-        zIndex: 10,
         writingMode: isVertical ? 'vertical-lr' : 'horizontal-tb',
       }}
-      className="text-black font-medium text-xs px-2 py-1 bg-transparent"
+      className="cursor-move select-none z-10 text-black font-medium text-xs px-2 py-1 bg-transparent"
     >
       {text}
     </div>
