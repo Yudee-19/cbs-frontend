@@ -1,17 +1,11 @@
 import { useRef } from "react";
 import { useDrop } from "react-dnd";
 import { Button } from "@/components/ui/button";
-import type { ChequeFormData, FieldPositions } from "../NewChequePage";
+import type { ChequePreviewProps } from "../types/types";
 import chequeImage from "@/assets/cheque.png";
 import chequeVerticalImage from "@/assets/cheque-vertical.png";
 import DraggableField from "./DraggableField";
 import { printCheque } from "../utils/utils";
-
-interface ChequePreviewProps {
-  formData: ChequeFormData;
-  fieldPositions: FieldPositions;
-  onFieldPositionsChange: (positions: FieldPositions) => void;
-}
 
 const ChequePreview = ({ formData, fieldPositions, onFieldPositionsChange }: ChequePreviewProps): React.ReactNode => {
   const isVertical = formData.orientation === "vertical";

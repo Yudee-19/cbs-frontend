@@ -11,15 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { ChequeFormData } from "../NewChequePage";
-import { BANK_OPTIONS } from "../NewChequePage";
+import type { ChequeFormProps } from "../types/types";
+import { BANK_OPTIONS } from "../constants/constants";
 import { isValidPayeeName, isValidAmount } from "../utils/utils";
-
-interface ChequeFormProps {
-  formData: ChequeFormData;
-  onInputChange: (field: keyof ChequeFormData, value: unknown) => void;
-  onGeneratePreview: () => void;
-}
 
 const ChequeForm = ({ 
   formData, 

@@ -1,11 +1,5 @@
 import { useDrag } from 'react-dnd';
-
-interface DraggableFieldProps {
-  id: string;
-  text: string;
-  position: { x: number; y: number };
-  isVertical?: boolean;
-}
+import type { DraggableFieldProps } from "../types/types";
 
 const DraggableField = ({ id, text, position, isVertical = false }: DraggableFieldProps) => {
   const [{ isDragging }, drag] = useDrag({
@@ -29,7 +23,7 @@ const DraggableField = ({ id, text, position, isVertical = false }: DraggableFie
         zIndex: 10,
         writingMode: isVertical ? 'vertical-lr' : 'horizontal-tb',
       }}
-      className="text-black font-medium text-sm px-2 py-1 bg-transparent"
+      className="text-black font-medium text-xs px-2 py-1 bg-transparent"
     >
       {text}
     </div>

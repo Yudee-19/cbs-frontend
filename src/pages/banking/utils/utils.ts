@@ -1,3 +1,5 @@
+import type { PrintChequeParams } from "../types/types";
+
 // Validation functions
 export const isValidPayeeName = (name: string): boolean => {
     if (!name || name.trim().length === 0) {
@@ -57,23 +59,6 @@ export const isValidAmount = (amount: string): boolean => {
 };
 
 // Print utility function
-interface PrintChequeParams {
-  imgElement: HTMLImageElement | null;
-  formData: {
-    date: string;
-    payeeName: string;
-    amount: string;
-    amountInWords: string;
-  };
-  fieldPositions: {
-    date: { x: number; y: number };
-    payeeName: { x: number; y: number };
-    amount: { x: number; y: number };
-    amountInWords: { x: number; y: number };
-  };
-  isVertical: boolean;
-}
-
 export const printCheque = ({
   imgElement,
   formData,
