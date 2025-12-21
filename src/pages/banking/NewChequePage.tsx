@@ -20,6 +20,18 @@ export interface ChequeFormData {
   orientation: "horizontal" | "vertical";
 }
 
+export interface FieldPosition {
+  x: number;
+  y: number;
+}
+
+export interface FieldPositions {
+  payeeName: FieldPosition;
+  amount: FieldPosition;
+  amountInWords: FieldPosition;
+  date: FieldPosition;
+}
+
 export interface BankOption {
   id: string;
   name: string;
@@ -70,9 +82,26 @@ export const BANK_OPTIONS: BankOption[] = [
   },
 ];
 
+// Default positions for horizontal orientation
+const defaultHorizontalPositions: FieldPositions = {
+  date: { x: 360, y: 6 },
+  payeeName: { x: 60, y: 80 },
+  amount: { x: 380, y: 80 },
+  amountInWords: { x: 55, y: 100 },
+};
+
+// Default positions for vertical orientation
+const defaultVerticalPositions: FieldPositions = {
+  date: { x: 190, y: 370 },
+  payeeName: { x: 115, y: 60 },
+  amount: { x: 110, y: 380 },
+  amountInWords: { x: 95, y: 55 },
+};
+
 const NewChequePage = () => {
     const [formData, setFormData] = useState<ChequeFormData>(defaultChequeFormData);
     const [previewData, setPreviewData] = useState<ChequeFormData>(defaultChequeFormData);
+    const [fieldPositions, setFieldPositions] = useState<FieldPositions>(defaultHorizontalPositions);
 
     const handleInputChange = (field: keyof ChequeFormData, value: unknown) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
@@ -83,6 +112,12 @@ const NewChequePage = () => {
         const updatedData = { ...formData, amountInWords };
         setFormData(updatedData);
         setPreviewData(updatedData);
+        
+        // Reset field positions to default based on orientation
+        const defaultPositions = formData.orientation === "vertical" 
+            ? defaultVerticalPositions 
+            : defaultHorizontalPositions;
+        setFieldPositions(defaultPositions);
     };
 
     return (
@@ -105,7 +140,11 @@ const NewChequePage = () => {
                     {/* Preview Section */}
                     <Card className="shadow-sm flex flex-col bg-white min-w-[550px] pt-0 pb-0 shadow-none h-full">
                         <CardContent className="p-6 flex flex-col h-full">
-                            <ChequePreview formData={previewData} />
+                            <ChequePreview 
+                                formData={previewData}
+                                fieldPositions={fieldPositions}
+                                onFieldPositionsChange={setFieldPositions}
+                            />
                         </CardContent>
                     </Card>
                 </div>

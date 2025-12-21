@@ -71,12 +71,14 @@ interface PrintChequeParams {
     amount: { x: number; y: number };
     amountInWords: { x: number; y: number };
   };
+  isVertical: boolean;
 }
 
 export const printCheque = ({
   imgElement,
   formData,
   fieldPositions,
+  isVertical,
 }: PrintChequeParams): void => {
   // Get the cheque image dimensions
   const imgWidth = imgElement?.offsetWidth || 800;
@@ -109,7 +111,7 @@ export const printCheque = ({
         <title>Print Cheque</title>
         <style>
           @page {
-            size: landscape;
+            size: ${isVertical ? 'portrait' : 'landscape'};
             margin: 0;
           }
           html, body {
@@ -149,6 +151,7 @@ export const printCheque = ({
             padding: 0;
             line-height: normal;
             vertical-align: top;
+            writing-mode: ${isVertical ? 'vertical-lr' : 'horizontal-tb'};
           }
           @media print {
             body {
