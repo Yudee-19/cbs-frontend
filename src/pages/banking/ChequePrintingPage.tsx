@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, Plus, List } from "lucide-react";
@@ -30,6 +31,7 @@ const chequeDummyData = [
 ];
 
 const ChequePrintingPage = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(25);
 
@@ -67,7 +69,7 @@ const ChequePrintingPage = () => {
                 size="sm"
                 aria-label="New Cheque"
                 title="New Cheque"
-                onClick={() => console.log("New Cheque")}
+                onClick={() => navigate("/banking/cheque-printing/new-cheque")}
               >
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">New Cheque</span>
