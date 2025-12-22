@@ -60,18 +60,13 @@ const LicensePage = () => {
   const [form, setForm] = useState<LicenseData>(emptyForm);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const fetchData = async (showToast = false) => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const { total: totalCount, items } = await listLicenses(page, rowsPerPage);
       setItems(Array.isArray(items) ? items : []);
       setTotal(Number(totalCount) || (Array.isArray(items) ? items.length : 0));
       setError(null);
-      if (showToast) {
-        toast.success("License list refreshed", {
-          description: `Loaded ${items.length} item${items.length === 1 ? "" : "s"}.`,
-        });
-      }
     } catch (e: any) {
       setError(e?.message || "Failed to load licenses.");
       toast.error("Failed to load licenses", {
@@ -83,7 +78,7 @@ const LicensePage = () => {
   };
 
   useEffect(() => {
-    fetchData(false);
+    fetchData();
   }, [page, rowsPerPage]);
 
   const paginated = useMemo(() => items, [items]);
@@ -130,7 +125,7 @@ const LicensePage = () => {
       toast.success("License deleted", { description: itemToDelete.name });
       setDeleteDialogOpen(false);
       setItemToDelete(null);
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
     } finally {
@@ -189,7 +184,7 @@ const LicensePage = () => {
         await updateLicenseById(current.id, payload);
         toast.success("License updated", { description: form.name });
       }
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error(mode === "add" ? "Create failed" : "Update failed", {
         description: e?.message ?? "Unexpected error",

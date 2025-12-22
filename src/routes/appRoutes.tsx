@@ -40,6 +40,9 @@ const LegalDocumentPage = lazy(() => import('@/pages/company-document/legal-docu
 const AduitReportPage = lazy(() => import('@/pages/company-document/aduit-report/AduitReportPage'));
 const ISOCertificationsPage = lazy(() => import('@/pages/company-document/iso-certifications/ISOCertificationsPage'));
 const ChequePrintingPage = lazy(()=> import('@/pages/banking/ChequePrintingPage'));
+const MyAttendance = lazy(() => import('@/pages/myAttendance/MyAttendance'));
+const LeaveRequest = lazy(() => import('@/pages/leaveRequest/LeaveRequest'));
+const DashboardPage = lazy(() => import('@/pages/dashboard/dashboardPage'));
 
 export const router = createBrowserRouter([
   {
@@ -53,16 +56,16 @@ export const router = createBrowserRouter([
       {
         path:'/', element: <Navigate to="/dashboard" replace />
       },
-      { path: '/dashboard', element: <div>Dashboard Content</div> },
+      { path: '/dashboard', element: (<Suspense fallback={<LoadingFallback />}><DashboardPage /></Suspense>) },
       {
         path: 'assets', element: <Navigate to="/assets/land-building" replace />,
       },
       
       {
-        path : '/my-attendance', element: <div>My Attendance Page</div>
+        path : '/my-attendance', element:(<Suspense fallback={<LoadingFallback />}><MyAttendance /></Suspense>)
       },
       {
-        path : '/leave-application', element: <div>Leave Application Page</div>
+        path : '/leave-application', element: (<Suspense fallback={<LoadingFallback />}><LeaveRequest /></Suspense>)
       },
       {
         path :'/banking', element: <Navigate to="/banking/cheque-printing" replace />

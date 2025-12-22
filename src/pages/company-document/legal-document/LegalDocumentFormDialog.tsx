@@ -5,6 +5,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import type { LegalDocData } from "@/services/company-documents/LegalDocServices";
 import { Loader2 } from "lucide-react";
 import { FileUploader } from "@/components/ui/FileUploader";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 
 type Mode = "add" | "edit";
 
@@ -17,6 +18,7 @@ interface Props {
     onClose: () => void;
     onDelete?: () => void;
     submitting?: boolean;
+    onFilesChanged?: (files: File[]) => void;
 }
 
 export const LegalDocumentFormDialog: React.FC<Props> = ({
@@ -28,6 +30,7 @@ export const LegalDocumentFormDialog: React.FC<Props> = ({
     onClose,
     onDelete,
     submitting = false,
+    onFilesChanged,
 }) => {
     const footer = (
         <>
@@ -113,12 +116,21 @@ export const LegalDocumentFormDialog: React.FC<Props> = ({
                     <label className="block text-xs text-muted-foreground mb-1">
                         Category
                     </label>
-                    <input
-                        className="w-full border rounded px-2 py-1"
+                    <Select
                         value={form.category || ""}
-                        onChange={(e) => onChange({ category: e.target.value })}
-                        disabled={submitting}
-                    />
+                        onValueChange={(v) => onChange({ category: v })}
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Contract">Contract</SelectItem>
+                            <SelectItem value="Template">Template</SelectItem>
+                            <SelectItem value="Agreement">Agreement</SelectItem>
+                            <SelectItem value="Policy">Policy</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div>
@@ -163,9 +175,7 @@ export const LegalDocumentFormDialog: React.FC<Props> = ({
                         Attachments
                     </label>
                     <FileUploader
-                        className={
-                            submitting ? "pointer-events-none opacity-50" : ""
-                        }
+                        className={submitting ? "pointer-events-none opacity-50" : ""}
                         acceptedTypes={[
                             "application/pdf",
                             "application/msword",
@@ -176,6 +186,7 @@ export const LegalDocumentFormDialog: React.FC<Props> = ({
                         onFilesChanged={(files) => {
                             const first = files[0];
                             onChange({ fileKey: first ? first.name : "" });
+                            onFilesChanged?.(files);
                         }}
                     />
                     <p className="mt-1 text-xs text-muted-foreground">

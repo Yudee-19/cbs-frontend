@@ -25,6 +25,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
+import { getPresignedUrls, uploadFileToS3 } from "@/services/utils/fileUploaderService";
 
 type Mode = "view" | "edit" | "add";
 
@@ -58,19 +59,15 @@ const AduitReportPage = () => {
   const [itemToDelete, setItemToDelete] = useState<Audit | null>(null);
 
   const [form, setForm] = useState<AuditData>(emptyForm);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const fetchData = async (showToast = false) => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const { total: totalCount, items } = await listAudits(page, rowsPerPage);
       setItems(Array.isArray(items) ? items : []);
       setTotal(Number(totalCount) || (Array.isArray(items) ? items.length : 0));
       setError(null);
-      if (showToast) {
-        toast.success("Audit reports refreshed", {
-          description: `Loaded ${items.length} item${items.length === 1 ? "" : "s"}.`,
-        });
-      }
     } catch (e: any) {
       setError(e?.message || "Failed to load audit reports.");
       toast.error("Failed to load audit reports", { description: e?.message ?? "Unexpected error" });
@@ -80,7 +77,7 @@ const AduitReportPage = () => {
   };
 
   useEffect(() => {
-    fetchData(false);
+    fetchData();
   }, [page, rowsPerPage]);
 
   const paginated = useMemo(() => items, [items]);
@@ -89,6 +86,7 @@ const AduitReportPage = () => {
     setMode("add");
     setCurrent(null);
     setForm(emptyForm);
+    setSelectedFile(null);
     setEditDialogOpen(true);
   };
 
@@ -110,6 +108,7 @@ const AduitReportPage = () => {
       completionDate: item.completionDate ?? "",
       fileKey: item.fileKey ?? "",
     });
+    setSelectedFile(null);
     setEditDialogOpen(true);
   };
 
@@ -126,7 +125,7 @@ const AduitReportPage = () => {
       toast.success("Audit deleted", { description: itemToDelete.name });
       setDeleteDialogOpen(false);
       setItemToDelete(null);
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error("Delete failed", { description: e?.message ?? "Unexpected error" });
     } finally {
@@ -140,29 +139,53 @@ const AduitReportPage = () => {
     return d.toISOString();
   };
 
-  const onFormChange = (patch: Partial<AuditData>) => setForm((p) => ({ ...p, ...patch }));
+  // const onFormChange = (patch: Partial<AuditData>) => setForm((p) => ({ ...p, ...patch }));
 
   const handleFormSubmit = async () => {
     setSubmitting(true);
     try {
+      let fileKeyToUse = form.fileKey || "";
+
+      if (selectedFile) {
+        const presign = await getPresignedUrls("audit", [
+          {
+            filename: selectedFile.name,
+            mimeType: selectedFile.type || "application/octet-stream",
+            size: selectedFile.size,
+            fileType: "certificate",
+          },
+        ]);
+
+        const first = presign?.data?.files?.[0];
+        if (!first?.presignedUrl || !first?.s3Key) {
+          throw new Error("Failed to get upload URL");
+        }
+
+        await uploadFileToS3(
+          first.presignedUrl,
+          selectedFile,
+          selectedFile.type || "application/octet-stream"
+        );
+
+        fileKeyToUse = first.s3Key;
+      }
+
+      const payload: AuditData = {
+        ...form,
+        periodStart: toISODate(form.periodStart),
+        periodEnd: toISODate(form.periodEnd),
+        completionDate: form.completionDate ? toISODate(form.completionDate) : "",
+        fileKey: fileKeyToUse || undefined,
+      };
+
       if (mode === "add") {
-        await createAudit({
-          ...form,
-          periodStart: toISODate(form.periodStart),
-          periodEnd: toISODate(form.periodEnd),
-          completionDate: form.completionDate ? toISODate(form.completionDate) : undefined,
-        });
+        await createAudit(payload);
         toast.success("Audit created", { description: form.name });
       } else if (mode === "edit" && current) {
-        await updateAuditById(current.id, {
-          ...form,
-          periodStart: toISODate(form.periodStart),
-          periodEnd: toISODate(form.periodEnd),
-          completionDate: form.completionDate ? toISODate(form.completionDate) : undefined,
-        });
+        await updateAuditById(current.id, payload);
         toast.success("Audit updated", { description: form.name });
       }
-      await fetchData(true);
+      await fetchData();
     } catch (e: any) {
       toast.error(mode === "add" ? "Create failed" : "Update failed", {
         description: e?.message ?? "Unexpected error",
@@ -221,11 +244,16 @@ const AduitReportPage = () => {
         open={editDialogOpen}
         mode={mode === "add" ? "add" : "edit"}
         form={form}
-        onChange={onFormChange}
+        onChange={(patch) => setForm((p) => ({ ...p, ...patch }))}
         onSubmit={handleFormSubmit}
         onClose={() => setEditDialogOpen(false)}
         onDelete={mode === "edit" && current ? () => requestDelete(current) : undefined}
         submitting={submitting}
+        onFilesChanged={(files) => {
+          const first = files[0];
+          setSelectedFile(first ?? null);
+          setForm((p) => ({ ...p, fileKey: first ? first.name : "" }));
+        }}
       />
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
