@@ -25,6 +25,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
+import { getPresignedUrls, uploadFileToS3 } from "@/services/utils/fileUploaderService";
 
 type Mode = "view" | "edit" | "add";
 
@@ -57,6 +58,7 @@ const LicensePage = () => {
   const [itemToDelete, setItemToDelete] = useState<License | null>(null);
 
   const [form, setForm] = useState<LicenseData>(emptyForm);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const fetchData = async (showToast = false) => {
     try {
@@ -90,6 +92,7 @@ const LicensePage = () => {
     setMode("add");
     setCurrent(null);
     setForm(emptyForm);
+    setSelectedFile(null);
     setEditDialogOpen(true);
   };
 
@@ -110,6 +113,7 @@ const LicensePage = () => {
       issuingAuthority: item.issuingAuthority,
       fileKey: item.fileKey ?? "",
     });
+    setSelectedFile(null);
     setEditDialogOpen(true);
   };
 
@@ -140,24 +144,49 @@ const LicensePage = () => {
     return d.toISOString();
   };
 
-  const onFormChange = (patch: Partial<LicenseData>) => setForm((p) => ({ ...p, ...patch }));
+  // const onFormChange = (patch: Partial<LicenseData>) => setForm((p) => ({ ...p, ...patch }));
 
   const handleFormSubmit = async () => {
     setSubmitting(true);
     try {
+      let fileKeyToUse = form.fileKey || "";
+
+      if (selectedFile) {
+        const presign = await getPresignedUrls("license", [
+          {
+            filename: selectedFile.name,
+            mimeType: selectedFile.type || "application/octet-stream",
+            size: selectedFile.size,
+            fileType: "certificate",
+          },
+        ]);
+
+        const first = presign?.data?.files?.[0];
+        if (!first?.presignedUrl || !first?.s3Key) {
+          throw new Error("Failed to get upload URL");
+        }
+
+        await uploadFileToS3(
+          first.presignedUrl,
+          selectedFile,
+          selectedFile.type || "application/octet-stream"
+        );
+
+        fileKeyToUse = first.s3Key;
+      }
+
+      const payload = {
+        ...form,
+        issueDate: toISODate(form.issueDate),
+        expiryDate: toISODate(form.expiryDate),
+        fileKey: fileKeyToUse || undefined,
+      };
+
       if (mode === "add") {
-        await createLicense({
-          ...form,
-          issueDate: toISODate(form.issueDate),
-          expiryDate: toISODate(form.expiryDate),
-        });
+        await createLicense(payload);
         toast.success("License created", { description: form.name });
       } else if (mode === "edit" && current) {
-        await updateLicenseById(current.id, {
-          ...form,
-          issueDate: toISODate(form.issueDate),
-          expiryDate: toISODate(form.expiryDate),
-        });
+        await updateLicenseById(current.id, payload);
         toast.success("License updated", { description: form.name });
       }
       await fetchData(true);
@@ -220,11 +249,18 @@ const LicensePage = () => {
         open={editDialogOpen}
         mode={mode === "add" ? "add" : "edit"}
         form={form}
-        onChange={onFormChange}
+        onChange={(patch) => {
+          setForm((p) => ({ ...p, ...patch }));
+        }}
         onSubmit={handleFormSubmit}
         onClose={() => setEditDialogOpen(false)}
         onDelete={mode === "edit" && current ? () => requestDelete(current) : undefined}
         submitting={submitting}
+        onFilesChanged={(files) => {
+          const first = files[0];
+          setSelectedFile(first ?? null);
+          setForm((p) => ({ ...p, fileKey: first ? first.name : "" }));
+        }}
       />
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
