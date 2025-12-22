@@ -1,5 +1,6 @@
 export interface ChequeFormData {
   bank: string;
+  bankAccountId: string;
   branch: string;
   account: string;
   currentCheque: string;
@@ -26,6 +27,7 @@ export interface FieldPositions {
 export interface BankOption {
   id: string;
   name: string;
+  bankAccountId: string;
   branch: string;
   account: string;
   currentCheque: string;

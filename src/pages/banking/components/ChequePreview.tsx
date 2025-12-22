@@ -1,15 +1,18 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useDrop } from "react-dnd";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import type { ChequePreviewProps } from "../types/types";
 import chequeImage from "@/assets/cheque.png";
 import chequeVerticalImage from "@/assets/cheque-vertical.png";
 import DraggableField from "./DraggableField";
 import { printCheque } from "../utils/utils";
+import { createCheque, updateChequePrintStatus } from "@/services/banking/ChequeServices";
 
 const ChequePreview = ({ formData, fieldPositions, onFieldPositionsChange }: ChequePreviewProps): React.ReactNode => {
   const isVertical = formData.orientation === "vertical";
   const chequeRef = useRef<HTMLDivElement>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   const [{ isOver }, drop] = useDrop({
     accept: 'CHEQUE_FIELD',
@@ -32,22 +35,51 @@ const ChequePreview = ({ formData, fieldPositions, onFieldPositionsChange }: Che
 
   const showFields = formData.payeeName && formData.amount && formData.date;
 
-  const handlePrintCheque = () => {
+  const handlePrintCheque = async () => {
     if (!chequeRef.current) return;
 
-    const imgElement = chequeRef.current.querySelector('img') as HTMLImageElement | null;
-    
-    printCheque({
-      imgElement,
-      formData: {
-        date: formData.date,
+    try {
+      setIsPrinting(true);
+
+      // Save cheque data to backend first
+      const chequePayload = {
+        bankAccount: formData.bankAccountId, // MongoDB ObjectID
         payeeName: formData.payeeName,
-        amount: formData.amount,
-        amountInWords: formData.amountInWords,
-      },
-      fieldPositions,
-      isVertical,
-    });
+        amount: parseFloat(formData.amount),
+        chequeDate: new Date(formData.date).toISOString(),
+        address: formData.amountInWords, // Using amountInWords as address for now
+      };
+
+      const savedCheque = await createCheque(chequePayload);
+      const chequeId = savedCheque._id || savedCheque.id;
+
+      // Print the cheque
+      const imgElement = chequeRef.current.querySelector('img') as HTMLImageElement | null;
+      
+      printCheque({
+        imgElement,
+        formData: {
+          date: formData.date,
+          payeeName: formData.payeeName,
+          amount: formData.amount,
+          amountInWords: formData.amountInWords,
+        },
+        fieldPositions,
+        isVertical,
+      });
+
+      // Update print status to "Printed"
+      if (chequeId) {
+        await updateChequePrintStatus(chequeId as string, "Printed");
+      }
+
+      toast.success("Cheque saved and printed successfully!");
+    } catch (error: any) {
+      console.error("Error printing cheque:", error);
+      toast.error(error?.message || "Failed to save or print cheque");
+    } finally {
+      setIsPrinting(false);
+    }
   };
 
   return (
@@ -108,9 +140,10 @@ const ChequePreview = ({ formData, fieldPositions, onFieldPositionsChange }: Che
       {showFields && (
         <Button
           onClick={handlePrintCheque}
+          disabled={isPrinting}
           className="w-full bg-primary text-white font-medium py-2 rounded-lg"
         >
-          Print Cheque
+          {isPrinting ? "Printing..." : "Print Cheque"}
         </Button>
       )}
     </div>

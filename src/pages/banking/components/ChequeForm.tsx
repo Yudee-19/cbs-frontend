@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -14,19 +15,57 @@ import {
 import type { ChequeFormProps } from "../types/types";
 import { BANK_OPTIONS } from "../constants/constants";
 import { isValidPayeeName, isValidAmount } from "../utils/utils";
+import { listBankAccounts, type BankAccountData } from "@/services/banking/BankAccountServices";
 
 const ChequeForm = ({ 
   formData, 
   onInputChange, 
   onGeneratePreview,
 }: ChequeFormProps) => {
+  const [bankAccounts, setBankAccounts] = useState<BankAccountData[]>([]);
+  const [isLoadingBanks, setIsLoadingBanks] = useState(true);
+
+  console.log("Bank Accounts:", formData);
+
+  // Load bank accounts on component mount
+  useEffect(() => {
+    const loadBankAccounts = async () => {
+      try {
+        const response = await listBankAccounts();
+        setBankAccounts(response.items || []);
+      } catch (error) {
+        console.error("Failed to load bank accounts:", error);
+        toast.error("Failed to load bank accounts");
+        // Fall back to hardcoded options if API fails
+        setBankAccounts(
+          BANK_OPTIONS.map((bank) => ({
+            bankName: bank.name,
+            branch: bank.branch,
+            accountHolder: "",
+            accountNumber: bank.account,
+            currency: bank.currency,
+            currentChequeNumber: bank.currentCheque,
+            _id: bank.id,
+          }))
+        );
+      } finally {
+        setIsLoadingBanks(false);
+      }
+    };
+
+    loadBankAccounts();
+  }, []);
+
   const handleBankChange = (bankId: string) => {
-    const selectedBank = BANK_OPTIONS.find((bank) => bank.id === bankId);
+    const selectedBank = bankAccounts.find(
+      (bank) => (bank._id || bank.id) === bankId
+    );
     if (selectedBank) {
       onInputChange("bank", bankId);
+      onInputChange("bankAccountId", selectedBank._id || selectedBank.id || "");
       onInputChange("branch", selectedBank.branch);
-      onInputChange("account", selectedBank.account);
-      onInputChange("currentCheque", selectedBank.currentCheque);
+      onInputChange("account", selectedBank.accountNumber);
+      onInputChange("currentCheque", selectedBank.currentChequeNumber);
       onInputChange("currency", selectedBank.currency);
     }
   };
@@ -56,16 +95,22 @@ const ChequeForm = ({
         <label className="block text-xs text-muted-foreground mb-1">
           Select Bank / Business Contact
         </label>
-        <Select value={formData.bank} onValueChange={handleBankChange}>
+        <Select value={formData.bank} onValueChange={handleBankChange} disabled={isLoadingBanks}>
           <SelectTrigger className="w-full bg-gray-50 shadow-none">
-            <SelectValue placeholder="Select bank" />
+            <SelectValue placeholder={isLoadingBanks ? "Loading banks..." : "Select bank"} />
           </SelectTrigger>
           <SelectContent>
-            {BANK_OPTIONS.map((bank) => (
-              <SelectItem key={bank.id} value={bank.id}>
-                {bank.name}
+            {bankAccounts.length > 0 ? (
+              bankAccounts.map((bank) => (
+                <SelectItem key={bank._id || bank.id} value={bank._id || bank.id || ""}>
+                  {bank.bankName}
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-banks" disabled>
+                No banks available
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
       </div>
@@ -74,19 +119,19 @@ const ChequeForm = ({
       <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-input">
         <div>
           <Label className="text-xs text-gray-500 mb-1 block">Branch:</Label>
-          <p className="text-sm font-medium">{formData.branch}</p>
+          <p className="text-sm font-medium">{formData.branch || '-'}</p>
         </div>
         <div>
           <Label className="text-xs text-gray-500 mb-1 block">Account:</Label>
-          <p className="text-sm font-medium">{formData.account}</p>
+          <p className="text-sm font-medium">{formData.account || '-'}</p>
         </div>
         <div>
           <Label className="text-xs text-gray-500 mb-1 block">Current Cheque:</Label>
-          <p className="text-sm font-medium">{formData.currentCheque}</p>
+          <p className="text-sm font-medium">{formData.currentCheque || '-'}</p>
         </div>
         <div>
           <Label className="text-xs text-gray-500 mb-1 block">Currency:</Label>
-          <p className="text-sm font-medium">{formData.currency}</p>
+          <p className="text-sm font-medium">{formData.currency || '-'}</p>
         </div>
       </div>
 
@@ -107,7 +152,7 @@ const ChequeForm = ({
         <label className="block text-xs text-muted-foreground mb-1">Amount</label>
         <div className="flex gap-2">
           <div className="flex items-center px-3 bg-gray-50 rounded-md border border-input">
-            <span className="text-gray-600 font-medium">{formData.currency}</span>
+            <span className="text-gray-600 font-medium">{formData.currency || '-'}</span>
           </div>
           <Input
             type="number"

@@ -1,12 +1,13 @@
 import type { ChequeFormData, BankOption, FieldPositions } from "../types/types";
 
-// Dummy cheque data - REPLACE THIS AFTER BE INTEGRATION
+// Default cheque form data - Bank details are populated from API
 export const defaultChequeFormData: ChequeFormData = {
-  bank: "burgan-bank",
-  branch: "Farwaniya Branch - 239",
-  account: "0239-7074792-001-000",
-  currentCheque: "7074792001",
-  currency: "USD",
+  bank: "",
+  bankAccountId: "",
+  branch: "",
+  account: "",
+  currentCheque: "",
+  currency: "",
   payeeName: "",
   amount: "",
   amountInWords: "",
@@ -14,33 +15,9 @@ export const defaultChequeFormData: ChequeFormData = {
   orientation: "horizontal",
 };
 
-// Dummy bank data - REPLACE THIS AFTER BE INTEGRATION
-export const BANK_OPTIONS: BankOption[] = [
-  {
-    id: "burgan-bank",
-    name: "Burgan Bank – Crown International",
-    branch: "Farwaniya Branch - 239",
-    account: "0239-7074792-001-000",
-    currentCheque: "7074792001",
-    currency: "USD",
-  },
-  {
-    id: "nbk",
-    name: "National Bank of Kuwait",
-    branch: "Kuwait City Branch - 101",
-    account: "0101-1234567-001-000",
-    currentCheque: "1234567001",
-    currency: "KWD",
-  },
-  {
-    id: "cbd",
-    name: "Commercial Bank of Dubai",
-    branch: "Dubai Main Branch - 505",
-    account: "0505-9876543-001-000",
-    currentCheque: "9876543001",
-    currency: "AED",
-  },
-];
+// Bank options are now fetched from the API via BankAccountServices
+// This constant is kept for backward compatibility/fallback purposes
+export const BANK_OPTIONS: BankOption[] = [];
 
 // Default Field Positions for Horizontal Orientation
 export const defaultHorizontalPositions: FieldPositions = {
