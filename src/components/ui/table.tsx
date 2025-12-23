@@ -14,6 +14,7 @@ interface DataTableProps<T extends { id: string }> {
   onRowClick?: (row: T) => void;
   enableSelection?: boolean;
   columnStyles?: Record<string, string>;
+  customNoDataMessage?: React.ReactNode;
 }
 
 function DataTable<T extends { id: string }>({
@@ -22,6 +23,7 @@ function DataTable<T extends { id: string }>({
   onRowClick,
   enableSelection = false,
   columnStyles = {},
+  customNoDataMessage,
 }: DataTableProps<T>) {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -78,7 +80,7 @@ function DataTable<T extends { id: string }>({
                 colSpan={columns.length + (enableSelection ? 1 : 0)}
                 className="text-center p-4 text-gray-500"
               >
-                No data available
+                {customNoDataMessage || "No data available"}
               </td>
             </tr>
           ) : (

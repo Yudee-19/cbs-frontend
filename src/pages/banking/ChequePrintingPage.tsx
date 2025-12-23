@@ -60,7 +60,7 @@ const ChequePrintingPage = () => {
                 size="sm"
                 aria-label="Business Contacts"
                 title="Business Contacts"
-                onClick={() => console.log("Open Business Contacts")}
+                onClick={() => navigate("/banking/cheque-printing/business-contacts")}
               >
                 <Users className="h-4 w-4" />
                 <span className="hidden sm:inline">Business Contacts</span>

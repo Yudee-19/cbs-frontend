@@ -40,6 +40,7 @@ const LegalDocumentPage = lazy(() => import('@/pages/company-document/legal-docu
 const AduitReportPage = lazy(() => import('@/pages/company-document/aduit-report/AduitReportPage'));
 const ISOCertificationsPage = lazy(() => import('@/pages/company-document/iso-certifications/ISOCertificationsPage'));
 const ChequePrintingPage = lazy(()=> import('@/pages/banking/ChequePrintingPage'));
+const BusinessContactsPage = lazy(() => import('@/pages/banking/BusinessContactsPage'));
 const NewChequePage = lazy(()=> import('@/pages/banking/NewChequePage'));
 
 export const router = createBrowserRouter([
@@ -78,9 +79,16 @@ export const router = createBrowserRouter([
         )
       },
       {
+        path: '/banking/cheque-printing/business-contacts',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <BusinessContactsPage />
+          </Suspense>
+         )
+      },
+      {
         path : '/banking/cheque-printing/new-cheque',
-        element: 
-        (
+        element: (
           <Suspense fallback={<LoadingFallback />}>
             <NewChequePage />
           </Suspense>
