@@ -37,7 +37,7 @@ const EquipmentPage = lazy(() => import('@/pages/assets/Equipment/EquipmentPage'
 const FurniturePage = lazy(() => import('@/pages/assets/Furniture/FurniturePages'));
 const LicensePage = lazy(() => import('@/pages/company-document/license/LicensePage'));
 const LegalDocumentPage = lazy(() => import('@/pages/company-document/legal-document/LegalDocumentPage'));
-const AduitReportPage = lazy(() => import('@/pages/company-document/aduit-report/AduitReportPage'));
+const AduitReportPage = lazy(() => import('@/pages/company-document/audit-report/AuditReportPage'));
 const ISOCertificationsPage = lazy(() => import('@/pages/company-document/iso-certifications/ISOCertificationsPage'));
 const ChequePrintingPage = lazy(()=> import('@/pages/banking/ChequePrintingPage'));
 const MyAttendance = lazy(() => import('@/pages/myAttendance/MyAttendance'));

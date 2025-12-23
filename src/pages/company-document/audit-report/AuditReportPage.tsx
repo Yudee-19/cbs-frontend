@@ -3,7 +3,7 @@ import TablePagination from "@/components/ui/tablePagination";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
-import AduitReportTable from "./AduitReportTable";
+import AduitReportTable from "./AuditReportTable";
 import ShimmerTable from "@/components/ui/shimmerTable";
 import { toast } from "sonner";
 import {
@@ -14,8 +14,8 @@ import {
   type Audit,
   type AuditData,
 } from "@/services/company-documents/AuditServices";
-import { AduitReportFormDialog } from "./AduitReportFormDialog";
-import { AduitReportDetailsDrawer } from "./AduitReportDetailsDrawer";
+import { AduitReportFormDialog } from "./AuditReportFormDialog";
+import { AduitReportDetailsDrawer } from "./AuditReportDetailsDrawer";
 import {
   Dialog,
   DialogContent,
