@@ -25,8 +25,6 @@ const ChequeForm = ({
   const [bankAccounts, setBankAccounts] = useState<BankAccountData[]>([]);
   const [isLoadingBanks, setIsLoadingBanks] = useState(true);
 
-  console.log("Bank Accounts:", formData);
-
   // Load bank accounts on component mount
   useEffect(() => {
     const loadBankAccounts = async () => {
