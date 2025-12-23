@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import StatCard from "@/components/ui/statCard";
 import LeaveBalanceCard from "@/components/ui/leaveBalanceCard";
 import {
@@ -9,137 +10,132 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LeaveRequestTable from "./LeaveRequestTable"; // add
+import TablePagination from "@/components/ui/tablePagination";
+import { toast } from "sonner";
+import {
+  listLeaveApplications,
+  createLeaveApplication,
+  type LeaveApplication,
+  type LeaveApplicationData,
+} from "@/services/LeaveApplicationServices";
+import ShimmerTable from "@/components/ui/shimmerTable";
+import { LeaveApplicationFormDialog } from "./LeaveApplicationFormDialog";
 
-export const leaveRequestDummyData = [
-  {
-    id: 1,
-    requestId: "LV-2025-008",
-    leaveType: "Annual Leave",
-    startDate: "20/12/2025",
-    endDate: "25/12/2025",
-    days: 6,
-    reason: "Family Vacation",
-    appliedOn: "10/11/2025",
-    status: "Approved",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-  {
-    id: 2,
-    requestId: "LV-2025-009",
-    leaveType: "Sick Leave",
-    startDate: "15/12/2025",
-    endDate: "16/12/2025",
-    days: 2,
-    reason: "Medical Rest",
-    appliedOn: "14/12/2025",
-    status: "Pending",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-  {
-    id: 3,
-    requestId: "LV-2025-010",
-    leaveType: "Annual Leave",
-    startDate: "01/01/2026",
-    endDate: "05/01/2026",
-    days: 5,
-    reason: "New Year Trip",
-    appliedOn: "20/12/2025",
-    status: "Approved",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-  {
-    id: 4,
-    requestId: "LV-2025-011",
-    leaveType: "Emergency Leave",
-    startDate: "05/12/2025",
-    endDate: "05/12/2025",
-    days: 1,
-    reason: "Family Emergency",
-    appliedOn: "05/12/2025",
-    status: "Rejected",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-  {
-    id: 5,
-    requestId: "LV-2025-012",
-    leaveType: "Annual Leave",
-    startDate: "28/12/2025",
-    endDate: "30/12/2025",
-    days: 3,
-    reason: "Personal Work",
-    appliedOn: "18/12/2025",
-    status: "Pending",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-  {
-    id: 6,
-    requestId: "LV-2025-013",
-    leaveType: "Sick Leave",
-    startDate: "22/11/2025",
-    endDate: "23/11/2025",
-    days: 2,
-    reason: "Fever",
-    appliedOn: "22/11/2025",
-    status: "Approved",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-  {
-    id: 7,
-    requestId: "LV-2025-014",
-    leaveType: "Annual Leave",
-    startDate: "10/12/2025",
-    endDate: "12/12/2025",
-    days: 3,
-    reason: "Outstation Travel",
-    appliedOn: "01/12/2025",
-    status: "Late",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-  {
-    id: 8,
-    requestId: "LV-2025-015",
-    leaveType: "Casual Leave",
-    startDate: "18/12/2025",
-    endDate: "18/12/2025",
-    days: 1,
-    reason: "Personal Work",
-    appliedOn: "17/12/2025",
-    status: "Approved",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-  {
-    id: 9,
-    requestId: "LV-2025-016",
-    leaveType: "Annual Leave",
-    startDate: "02/01/2026",
-    endDate: "04/01/2026",
-    days: 3,
-    reason: "Family Function",
-    appliedOn: "22/12/2025",
-    status: "Pending",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-  {
-    id: 10,
-    requestId: "LV-2025-017",
-    leaveType: "Sick Leave",
-    startDate: "29/11/2025",
-    endDate: "29/11/2025",
-    days: 1,
-    reason: "Doctor Visit",
-    appliedOn: "29/11/2025",
-    status: "Approved",
-    approvedBy: "MD Al-Saleh (HR)",
-  },
-];
+function formatDate(iso?: string) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-GB"); // dd/mm/yyyy
+}
 
+function calcDays(startISO?: string, endISO?: string) {
+  const s = startISO ? new Date(startISO) : null;
+  const e = endISO ? new Date(endISO) : null;
+  if (!s || !e || Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return 0;
+  const ms = e.getTime() - s.getTime();
+  return Math.max(1, Math.floor(ms / 86400000) + 1);
+}
 
 export default function LeaveRequest() {
-  // top row stats (example values)
-  const pending = 1;
-  const approved = 2;
-  const rejected = 1;
-  const total = 1;
+  // Pagination + data (reference: LegalDocumentPage)
+  const [items, setItems] = useState<LeaveApplication[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [page, setPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [total, setTotal] = useState<number>(0);
+
+  // Dialog + form state
+  type Mode = "add" | "edit";
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [mode, setMode] = useState<Mode>("add");
+  const [submitting, setSubmitting] = useState(false);
+  const emptyForm: LeaveApplicationData = {
+    leaveType: "",
+    startDate: new Date().toISOString(),
+    endDate: new Date().toISOString(),
+    reason: "",
+    fileKey: "",
+  };
+  const [form, setForm] = useState<LeaveApplicationData>(emptyForm);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const { items: resItems, total: totalCount } = await listLeaveApplications("694a2922807c391f4e27bf6b", page, rowsPerPage);
+      setItems(Array.isArray(resItems) ? resItems : []);
+      setTotal(Number(totalCount) || (Array.isArray(resItems) ? resItems.length : 0));
+      setError(null);
+    } catch (e: any) {
+      setError(e?.message || "Failed to load leave requests.");
+      toast.error("Failed to load leave requests", { description: e?.message ?? "Unexpected error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [page, rowsPerPage]);
+
+  // Adapt API items to table shape expected by LeaveRequestTable
+  const tableData = useMemo(() => {
+    return (items || []).map((item, idx) => ({
+      id: item.id,
+      requestId: item.id || `LV-${new Date().getFullYear()}-${String(idx + 1).padStart(3, "0")}`,
+      leaveType: item.leaveType,
+      startDate: formatDate(item.startDate),
+      endDate: formatDate(item.endDate),
+      days: calcDays(item.startDate, item.endDate),
+      reason: item.reason,
+      appliedOn: formatDate(item.createdAt ?? item.startDate),
+      status: item.status ?? "Pending",
+      approvedBy: item.approvedBy ?? "",
+    }));
+  }, [items]);
+
+  // Derive stats from API items
+  const pending = items.filter((i) => (i.status ?? "").toLowerCase() === "pending").length;
+  const approved = items.filter((i) => (i.status ?? "").toLowerCase() === "approved").length;
+  const rejected = items.filter((i) => (i.status ?? "").toLowerCase() === "rejected").length;
+
+  const openAdd = () => {
+    setMode("add");
+    setForm({
+      leaveType: "Emergency Leave",
+      startDate: "2025-12-23T00:00:00.000Z",
+      endDate: "2025-12-25T00:00:00.000Z",
+      reason: "",
+    });
+    setEditDialogOpen(true);
+  };
+
+  const toISODate = (v: string) => {
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return new Date().toISOString();
+    return d.toISOString();
+  };
+
+  const handleFormSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const payload: LeaveApplicationData = {
+        leaveType: form.leaveType,
+        startDate: toISODate(form.startDate),
+        endDate: toISODate(form.endDate),
+        reason: form.reason,
+      };
+
+      await createLeaveApplication("694a2922807c391f4e27bf6b", payload);
+      toast.success("Leave request submitted");
+      await fetchData();
+    } catch (e: any) {
+      toast.error("Submit failed", { description: e?.message ?? "Unexpected error" });
+      throw e;
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -179,7 +175,7 @@ export default function LeaveRequest() {
               <h3 className="text-lg font-semibold">My Leave Balance -</h3>
               <span className="text-gray-500">2025</span>
             </div>
-            <Button >
+            <Button onClick={openAdd}>
               <Plus className="w-4 h-4" />
               Apply for leave
             </Button>
@@ -217,12 +213,47 @@ export default function LeaveRequest() {
           </div>
         </div>
 
-        {/* Row 3: table */}
+        {/* Row 3: table + pagination */}
         <div className="bg-white rounded-2xl shadow-sm p-5 border">
           <h3 className="text-lg font-semibold mb-3">My Leave Request</h3>
-          <LeaveRequestTable leaveRequests={leaveRequestDummyData} />
+
+          {loading ? (
+            <ShimmerTable rowCount={10} columnCount={7} />
+          ) : error ? (
+            <div className="text-sm text-red-600">{error}</div>
+          ) : (
+            <LeaveRequestTable leaveRequests={tableData} />
+          )}
+
+          <div className="mt-3">
+            <TablePagination
+              total={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(p: number) => setPage(p)}
+              onRowsPerPageChange={(r: number) => {
+                setRowsPerPage(r);
+                setPage(1);
+              }}
+            />
+          </div>
         </div>
       </div>
+
+      {/* Add/Edit Leave Dialog */}
+      <LeaveApplicationFormDialog
+        open={editDialogOpen}
+        mode={mode}
+        form={form}
+        onChange={(patch) => setForm((p) => ({ ...p, ...patch }))}
+        onSubmit={handleFormSubmit}
+        onClose={() => setEditDialogOpen(false)}
+        submitting={submitting}
+        onFilesChanged={(files) => {
+          const first = files[0];
+          setForm((p) => ({ ...p, fileKey: first ? first.name : "" }));
+        }}
+      />
     </div>
   );
 }
