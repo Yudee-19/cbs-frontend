@@ -1,15 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/table";
 import { getChequeManagerColumns } from "@/components/columns/banking/chequemanager";
 import { listCheques, updateCheque, type ChequeData } from "@/services/banking/ChequeServices";
 import { toast } from "sonner";
 
 const ChequeManagerPage = () => {
-  const navigate = useNavigate();
   const [cheques, setCheques] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
