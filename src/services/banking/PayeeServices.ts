@@ -4,10 +4,10 @@ export type PayeeData = {
   _id?: string;
   id?: string;
   name: string;
-  company: string;
-  category: string;
-  phone: string;
-  email: string;
+  company?: string;
+  category?: string;
+  phone?: string;
+  email?: string;
   address?: string;
   notes?: string;
   createdAt?: string;
