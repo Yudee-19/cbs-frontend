@@ -41,6 +41,7 @@ const AduitReportPage = lazy(() => import('@/pages/company-document/aduit-report
 const ISOCertificationsPage = lazy(() => import('@/pages/company-document/iso-certifications/ISOCertificationsPage'));
 const ChequePrintingPage = lazy(()=> import('@/pages/banking/ChequePrintingPage'));
 const NewChequePage = lazy(()=> import('@/pages/banking/NewChequePage'));
+const ChequeManagerPage = lazy(()=> import('@/pages/banking/ChequeManagerPage'));
 
 export const router = createBrowserRouter([
   {
@@ -83,6 +84,15 @@ export const router = createBrowserRouter([
         (
           <Suspense fallback={<LoadingFallback />}>
             <NewChequePage />
+          </Suspense>
+        )
+      },
+      {
+        path : '/banking/cheque-printing/cheque-manager',
+        element: 
+        (
+          <Suspense fallback={<LoadingFallback />}>
+            <ChequeManagerPage />
           </Suspense>
         )
       },
