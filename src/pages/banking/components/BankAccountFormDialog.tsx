@@ -15,6 +15,13 @@ const CURRENCY_OPTIONS = ["KWD", "USD", "EUR", "GBP", "AED", "SAR"] as const;
 
 type Mode = "add" | "edit" | "view";
 
+const BANK_FORM_STYLES = `
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(16, 24, 40, 0.8) !important;
+  }
+`;
+
 interface Props {
   open: boolean;
   mode: Mode;
@@ -53,12 +60,14 @@ export const BankAccountFormDialog: React.FC<Props> = ({
 
   const footer = (
     <>
+      <style>{BANK_FORM_STYLES}</style>
       <Button
         variant="outline"
         size="default"
         onClick={onClose}
         disabled={submitting}
         className="gap-2"
+        style={{ width: "158px" }}
       >
         <XCircle className="h-4 w-4" />
         Cancel
@@ -69,7 +78,7 @@ export const BankAccountFormDialog: React.FC<Props> = ({
         type="submit"
         size="default"
         disabled={submitting}
-        className="gap-2"
+        className="gap-2 flex-1"
       >
         {submitting ? (
           <>
@@ -93,7 +102,9 @@ export const BankAccountFormDialog: React.FC<Props> = ({
       title={mode === "add" ? "Add New Bank Account" : "Edit Bank Account"}
       description=""
       footer={footer}
-      maxWidth="max-w-3xl"
+      className="!w-[660px] !max-w-[660px] overflow-hidden !h-auto gap-0"
+      headerClassName="!border-b-0 pb-0 pt-4"
+      footerClassName="!border-t-0"
     >
       <form
         id="bank-account-form"
@@ -121,10 +132,11 @@ export const BankAccountFormDialog: React.FC<Props> = ({
         {/* Bank Name */}
         <div>
           <label className="block text-sm text-gray-600 mb-1.5">
-            Bank Name <span className="text-red-500">*</span>
+            Bank Name <span className="text-gray-600">*</span>
           </label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , Burgan Bank"
             value={form.bankName ?? ""}
             onChange={(e) => onChange({ bankName: e.target.value })}
@@ -137,6 +149,7 @@ export const BankAccountFormDialog: React.FC<Props> = ({
           <label className="block text-sm text-gray-600 mb-1.5">Branch</label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , Farwaniya Branch - 239"
             value={form.branch ?? ""}
             onChange={(e) => onChange({ branch: e.target.value })}
@@ -147,10 +160,11 @@ export const BankAccountFormDialog: React.FC<Props> = ({
         {/* Account Holder */}
         <div>
           <label className="block text-sm text-gray-600 mb-1.5">
-            Account Holder <span className="text-red-500">*</span>
+            Account Holder <span className="text-gray-600">*</span>
           </label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , Crown International"
             value={form.accountHolder ?? ""}
             onChange={(e) => onChange({ accountHolder: e.target.value })}
@@ -161,10 +175,11 @@ export const BankAccountFormDialog: React.FC<Props> = ({
         {/* Account Number */}
         <div>
           <label className="block text-sm text-gray-600 mb-1.5">
-            Account Number <span className="text-red-500">*</span>
+            Account Number <span className="text-gray-600">*</span>
           </label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , 2454-4548751-622-4522-965"
             value={form.accountNumber ?? ""}
             onChange={(e) => onChange({ accountNumber: e.target.value })}
@@ -180,7 +195,7 @@ export const BankAccountFormDialog: React.FC<Props> = ({
             onValueChange={(v) => onChange({ currency: v })}
             disabled={submitting}
           >
-            <SelectTrigger className="w-full h-10">
+            <SelectTrigger className="w-full h-10" style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -200,6 +215,7 @@ export const BankAccountFormDialog: React.FC<Props> = ({
           </label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , 84645115451"
             value={form.currentChequeNumber ?? ""}
             onChange={(e) => onChange({ currentChequeNumber: e.target.value })}
@@ -212,6 +228,7 @@ export const BankAccountFormDialog: React.FC<Props> = ({
           <label className="block text-sm text-gray-600 mb-1.5">Address</label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , Po box 5389, Ai Safat 12170, Kuwait"
             value={form.address ?? ""}
             onChange={(e) => onChange({ address: e.target.value })}

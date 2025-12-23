@@ -15,6 +15,13 @@ const CATEGORY_OPTIONS = ["Vendor", "Supplier", "Contractor", "Service Provider"
 
 type Mode = "add" | "edit" | "view";
 
+const PAYEE_FORM_STYLES = `
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(16, 24, 40, 0.8) !important;
+  }
+`;
+
 interface Props {
   open: boolean;
   mode: Mode;
@@ -36,12 +43,14 @@ export const PayeeFormDialog: React.FC<Props> = ({
 }) => {
   const footer = (
     <>
+      <style>{PAYEE_FORM_STYLES}</style>
       <Button
         variant="outline"
         size="default"
         onClick={onClose}
         disabled={submitting}
         className="gap-2"
+        style={{ width: "158px" }}
       >
         <XCircle className="h-4 w-4" />
         Cancel
@@ -52,7 +61,7 @@ export const PayeeFormDialog: React.FC<Props> = ({
         type="submit"
         size="default"
         disabled={submitting}
-        className="gap-2"
+        className="gap-2 flex-1"
       >
         {submitting ? (
           <>
@@ -76,7 +85,9 @@ export const PayeeFormDialog: React.FC<Props> = ({
       title={mode === "add" ? "Add New Payee" : "Edit Payee"}
       description=""
       footer={footer}
-      maxWidth="max-w-3xl"
+      className="!w-[660px] !max-w-[660px] overflow-hidden !h-auto gap-0"
+      headerClassName="!border-b-0 pb-0 pt-4"
+      footerClassName="!border-t-0"
     >
       <form
         id="payee-form"
@@ -105,10 +116,11 @@ export const PayeeFormDialog: React.FC<Props> = ({
         {/* Payee Name */}
         <div>
           <label className="block text-sm text-gray-600 mb-1.5">
-            Payee Name <span className="text-red-500">*</span>
+            Payee Name <span className="text-gray-600">*</span>
           </label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , John Doe"
             value={form.name ?? ""}
             onChange={(e) => onChange({ name: e.target.value })}
@@ -121,6 +133,7 @@ export const PayeeFormDialog: React.FC<Props> = ({
           <label className="block text-sm text-gray-600 mb-1.5">Company</label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , ABC Corporation"
             value={form.company ?? ""}
             onChange={(e) => onChange({ company: e.target.value })}
@@ -136,7 +149,7 @@ export const PayeeFormDialog: React.FC<Props> = ({
             onValueChange={(v) => onChange({ category: v })}
             disabled={submitting}
           >
-            <SelectTrigger className="w-full h-10">
+            <SelectTrigger className="w-full h-10" style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}>
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
             <SelectContent>
@@ -154,6 +167,7 @@ export const PayeeFormDialog: React.FC<Props> = ({
           <label className="block text-sm text-gray-600 mb-1.5">Phone</label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , 84645115451"
             value={form.phone ?? ""}
             onChange={(e) => onChange({ phone: e.target.value })}
@@ -164,11 +178,12 @@ export const PayeeFormDialog: React.FC<Props> = ({
         {/* Email */}
         <div className="col-span-2">
           <label className="block text-sm text-gray-600 mb-1.5">
-            Email <span className="text-red-500">*</span>
+            Email <span className="text-gray-600">*</span>
           </label>
           <input
             type="email"
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , contact@gmail.com"
             value={form.email ?? ""}
             onChange={(e) => onChange({ email: e.target.value })}
@@ -181,6 +196,7 @@ export const PayeeFormDialog: React.FC<Props> = ({
           <label className="block text-sm text-gray-600 mb-1.5">Address</label>
           <input
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="e.g , Po box 5389, Ai Safat 12170, Kuwait"
             value={form.address ?? ""}
             onChange={(e) => onChange({ address: e.target.value })}
@@ -193,6 +209,7 @@ export const PayeeFormDialog: React.FC<Props> = ({
           <label className="block text-sm text-gray-600 mb-1.5">Notes</label>
           <textarea
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            style={{ backgroundColor: "rgba(102, 112, 133, 0.04)", color: "rgba(16, 24, 40, 0.8)" }}
             placeholder="Additional Notes..."
             rows={4}
             value={form.notes ?? ""}

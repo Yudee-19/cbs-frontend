@@ -18,7 +18,8 @@ interface Props {
   children: React.ReactNode; // form or any content
   footer: React.ReactNode; // custom footer buttons
   className?: string;
-  maxWidth?: string;
+  headerClassName?: string;
+  footerClassName?: string;
 }
 
 export const CustomDialog: React.FC<Props> = ({
@@ -29,13 +30,14 @@ export const CustomDialog: React.FC<Props> = ({
   children,
   footer,
   className = "",
-  maxWidth = "max-w-2xl",
+  headerClassName = "",
+  footerClassName = "",
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* layout as column: header (top), scrollable body (flex-1), footer (bottom) */}
-      <DialogContent className={`${maxWidth} p-0 ${className} h-[80vh] flex flex-col rounded-lg`}>
-        <DialogHeader className="z-30 bg-white/95 backdrop-blur-sm px-4 py-3 border-b">
+      <DialogContent className={`p-0 ${className} h-auto flex flex-col rounded-lg`}>
+        <DialogHeader className={`z-30 bg-white/95 backdrop-blur-sm px-4 py-3 ${headerClassName}`}>
           <div className="flex items-start justify-between w-full gap-4">
             <div>
               <DialogTitle className="text-base">{title}</DialogTitle>
@@ -53,7 +55,7 @@ export const CustomDialog: React.FC<Props> = ({
         <div className="px-4 py-4 overflow-auto flex-1">{children}</div>
 
         {/* footer fixed to bottom of dialog (outside scrollable area) */}
-        <DialogFooter className="flex-shrink-0 bg-white/95 backdrop-blur-sm border-t px-4 py-3 flex gap-3 justify-end items-center">
+        <DialogFooter className={`flex-shrink-0 bg-white/95 backdrop-blur-sm px-4 py-3 flex gap-3 justify-end items-center ${footerClassName}`}>
           {footer}
         </DialogFooter>
       </DialogContent>

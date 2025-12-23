@@ -201,15 +201,15 @@ const BusinessContactsPage = () => {
       <Card className="shadow-sm flex flex-col h-full bg-white overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
           <div className="flex items-center justify-between px-2 sm:px-4 pt-4 mb-4">
-            <TabsList>
-              <TabsTrigger value="banks" className="flex items-center gap-2">
-                <Building2 className="h-4 w-4" />
-                Banks
-              </TabsTrigger>
-              <TabsTrigger value="payees" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Payees
-              </TabsTrigger>
+            <TabsList className="h-10 rounded-md border border-input overflow-hidden">
+                <TabsTrigger value="banks" className="h-full flex items-center gap-2 px-3 rounded-sm data-[state=active]:bg-primary data-[state=active]:text-white">
+                    <Building2 className="h-4 w-4" />
+                    Banks
+                </TabsTrigger>
+                <TabsTrigger value="payees" className="h-full flex items-center gap-2 px-3 rounded-sm data-[state=active]:bg-primary data-[state=active]:text-white">
+                    <Users className="h-5 w-4" />
+                    Payees
+                </TabsTrigger>
             </TabsList>
 
             <div className="flex items-center gap-2">
@@ -217,7 +217,7 @@ const BusinessContactsPage = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleBack}
-                className="flex items-center gap-2"
+                className="h-9 flex items-center gap-2 w-[200px]"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span className="hidden sm:inline">Back To Banking</span>
@@ -227,7 +227,7 @@ const BusinessContactsPage = () => {
                 <Button
                   size="sm"
                   variant="default"
-                  className="h-8 px-3 flex items-center gap-2"
+                  className="h-9 px-3 flex items-center gap-2 w-[200px]"
                   onClick={handleAddBank}
                 >
                   <Plus className="h-4 w-4" />
@@ -238,7 +238,7 @@ const BusinessContactsPage = () => {
                 <Button
                   size="sm"
                   variant="default"
-                  className="h-8 px-3 flex items-center gap-2"
+                  className="h-9 px-3 flex items-center gap-2 w-[200px]"
                   onClick={handleAddPayee}
                 >
                   <Plus className="h-4 w-4" />
