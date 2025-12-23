@@ -69,7 +69,7 @@ const ChequePrintingPage = () => {
                 size="sm"
                 aria-label="New Cheque"
                 title="New Cheque"
-                onClick={() => console.log("New Cheque")}
+                onClick={() => navigate("/banking/cheque-printing/new-cheque")}
               >
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">New Cheque</span>
@@ -88,8 +88,8 @@ const ChequePrintingPage = () => {
           </div>
         </CardHeader>
 
-        <CardContent className="flex-1 overflow-hidden px-2 sm:px-4">
-          <div className="overflow-x-auto h-full">
+        <CardContent className="flex-1 overflow-hidden p-0">
+          <div className="overflow-x-auto h-full px-2 sm:px-4">
             <ChequeReportTable
               chequeReports={paginated}
               onPrint={(row) => {
