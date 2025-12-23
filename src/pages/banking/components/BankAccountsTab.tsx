@@ -8,7 +8,12 @@ import {
   type BankAccountData,
 } from "@/services/banking/BankAccountServices";
 
-const BankAccountsTab = () => {
+interface BankAccountsTabProps {
+  onEdit?: (bank: BankAccountData) => void;
+  onDelete?: (bank: BankAccountData) => void;
+}
+
+const BankAccountsTab = ({ onEdit, onDelete }: BankAccountsTabProps) => {
   const [items, setItems] = useState<BankAccountData[]>([]);
   const [loading, setLoading] = useState(true);
   const hasCalledRef = useRef(false);
@@ -36,19 +41,16 @@ const BankAccountsTab = () => {
 
   const paginated = useMemo(() => items, [items]);
 
-  const handleView = (item: BankAccountData) => {
-    console.log("View bank account:", item);
-    // TODO: Implement view details
-  };
-
   const handleEdit = (item: BankAccountData) => {
-    console.log("Edit bank account:", item);
-    // TODO: Implement edit
+    if (onEdit) {
+      onEdit(item);
+    }
   };
 
   const handleDelete = (item: BankAccountData) => {
-    console.log("Delete bank account:", item);
-    // TODO: Implement delete
+    if (onDelete) {
+      onDelete(item);
+    }
   };
 
   return (
@@ -62,7 +64,7 @@ const BankAccountsTab = () => {
             id: e._id || e.id || "",
           }))}
           columnStyles={{}}
-          columns={getBankAccountColumns(handleView, handleEdit, handleDelete)}
+          columns={getBankAccountColumns(handleEdit, handleDelete)}
           customNoDataMessage={
               <div className="flex items-center justify-center text-sm text-muted-foreground">
                 No bank accounts added yet. Click "Add Bank Account" to get started.

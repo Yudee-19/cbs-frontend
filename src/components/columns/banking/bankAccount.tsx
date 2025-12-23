@@ -1,8 +1,7 @@
 import { ActionButtonWithTooltip } from "@/components/ui/actionButtonWithTooltip";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 export const getBankAccountColumns = (
-  onViewDetails: (item: any) => void,
   onEdit: (item: any) => void,
   onDelete: (item: any) => void
 ) => [
@@ -38,7 +37,7 @@ export const getBankAccountColumns = (
     key: "template",
     header: "Template",
     render: (row: any) => (
-      <div className="text-sm">{row.template || "-"}</div>
+      <div className="text-sm">{row.template || "No Template"}</div>
     ),
   },
   {
@@ -46,12 +45,6 @@ export const getBankAccountColumns = (
     header: "Actions",
     render: (row: any) => (
       <div className="flex items-center gap-1">
-        <ActionButtonWithTooltip
-          icon={<Eye size={18} />}
-          tooltip="View"
-          onClick={() => onViewDetails?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-blue-50 hover:text-primary text-primary rounded-md"
-        />
         <ActionButtonWithTooltip
           icon={<Edit size={18} />}
           tooltip="Edit"

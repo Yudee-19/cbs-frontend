@@ -7,7 +7,12 @@ import {
   listPayees,
 } from "@/services/banking/PayeeServices";
 
-const PayeesTab = () => {
+interface PayeesTabProps {
+  onEdit?: (payee: PayeeData) => void;
+  onDelete?: (payee: PayeeData) => void;
+}
+
+const PayeesTab = ({ onEdit, onDelete }: PayeesTabProps) => {
   const [items, setItems] = useState<PayeeData[]>([]);
   const [loading, setLoading] = useState(true);
   const hasCalledRef = useRef(false);
@@ -35,19 +40,16 @@ const PayeesTab = () => {
 
   const paginated = useMemo(() => items, [items]);
 
-  const handleView = (item: PayeeData) => {
-    console.log("View payee:", item);
-    // TODO: Implement view details
-  };
-
   const handleEdit = (item: PayeeData) => {
-    console.log("Edit payee:", item);
-    // TODO: Implement edit
+    if (onEdit) {
+      onEdit(item);
+    }
   };
 
   const handleDelete = (item: PayeeData) => {
-    console.log("Delete payee:", item);
-    // TODO: Implement delete
+    if (onDelete) {
+      onDelete(item);
+    }
   };
 
   return (
@@ -62,7 +64,7 @@ const PayeesTab = () => {
               id: e._id || e.id || "",
             }))}
             columnStyles={{}}
-            columns={getPayeeColumns(handleView, handleEdit, handleDelete)}
+            columns={getPayeeColumns(handleEdit, handleDelete)}
             customNoDataMessage={
               <div className="flex items-center justify-center text-sm text-muted-foreground">
                 No payees added yet. Click "Add Payee" to get started.

@@ -1,5 +1,5 @@
 import { ActionButtonWithTooltip } from "@/components/ui/actionButtonWithTooltip";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 export interface PayeeData {
   _id?: string;
@@ -12,7 +12,6 @@ export interface PayeeData {
 }
 
 export const getPayeeColumns = (
-  onViewDetails: (item: any) => void,
   onEdit: (item: any) => void,
   onDelete: (item: any) => void
 ) => [
@@ -56,12 +55,6 @@ export const getPayeeColumns = (
     header: "Actions",
     render: (row: any) => (
       <div className="flex items-center gap-1">
-        <ActionButtonWithTooltip
-          icon={<Eye size={18} />}
-          tooltip="View"
-          onClick={() => onViewDetails?.(row)}
-          colorClass="h-7 w-7 bg-gray-100 hover:bg-blue-50 hover:text-primary text-primary rounded-md"
-        />
         <ActionButtonWithTooltip
           icon={<Edit size={18} />}
           tooltip="Edit"
