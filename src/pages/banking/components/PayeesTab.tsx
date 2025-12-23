@@ -1,23 +1,37 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import DataTable from "@/components/ui/table";
 import ShimmerTable from "@/components/ui/shimmerTable";
+import { toast } from "sonner";
 import { getPayeeColumns, type PayeeData } from "@/components/columns/banking/payee";
-
-// Dummy payee data - replace with actual API call
-const dummyPayees: PayeeData[] = [];
+import {
+  listPayees,
+} from "@/services/banking/PayeeServices";
 
 const PayeesTab = () => {
   const [items, setItems] = useState<PayeeData[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const hasCalledRef = useRef(false);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { items: data } = await listPayees(1, 200);
+      setItems(Array.isArray(data) ? data : []);
+    } catch (e: any) {
+      toast.error("Failed to load payees", {
+        description: e?.message ?? "",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    // Simulate loading
-    setLoading(true);
-    setTimeout(() => {
-      setItems(dummyPayees);
-      setLoading(false);
-    }, 500);
-  }, []);
+    if (!hasCalledRef.current) {
+      hasCalledRef.current = true;
+      fetchData();
+    }
+  }, [fetchData]);
 
   const paginated = useMemo(() => items, [items]);
 

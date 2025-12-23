@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import DataTable from "@/components/ui/table";
 import ShimmerTable from "@/components/ui/shimmerTable";
 import { toast } from "sonner";
@@ -11,27 +11,28 @@ import {
 const BankAccountsTab = () => {
   const [items, setItems] = useState<BankAccountData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const hasCalledRef = useRef(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const { items: data } = await listBankAccounts(1, 200);
       setItems(Array.isArray(data) ? data : []);
-      setError(null);
     } catch (e: any) {
-      setError(e?.message ?? "Failed to load bank accounts");
       toast.error("Failed to load bank accounts", {
         description: e?.message ?? "",
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!hasCalledRef.current) {
+      hasCalledRef.current = true;
+      fetchData();
+    }
+  }, [fetchData]);
 
   const paginated = useMemo(() => items, [items]);
 
@@ -54,8 +55,6 @@ const BankAccountsTab = () => {
     <div className="flex-1 overflow-y-auto">
       {loading ? (
         <ShimmerTable rowCount={10} columnCount={5} />
-      ) : error ? (
-        <div className="text-sm text-red-600">{error}</div>
       ) : (
         <DataTable
           data={paginated.map((e) => ({
