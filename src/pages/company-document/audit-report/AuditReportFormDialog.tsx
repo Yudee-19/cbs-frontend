@@ -5,6 +5,13 @@ import { DialogClose } from "@/components/ui/dialog";
 import type { AuditData } from "@/services/company-documents/AuditServices";
 import { Loader2 } from "lucide-react";
 import { FileUploader } from "@/components/ui/FileUploader";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Mode = "add" | "edit";
 
@@ -17,7 +24,16 @@ interface Props {
     onClose: () => void;
     onDelete?: () => void;
     submitting?: boolean;
+    onFilesChanged?: (files: File[]) => void;
 }
+
+const ALLOWED_TYPES = [
+  "Financial Audit",
+  "Internal Audit",
+  "Compliance Audit",
+  "Tax Audit",
+  "Operational Audit",
+];
 
 export const AduitReportFormDialog: React.FC<Props> = ({
     open,
@@ -28,6 +44,7 @@ export const AduitReportFormDialog: React.FC<Props> = ({
     onClose,
     onDelete,
     submitting = false,
+    onFilesChanged,
 }) => {
     const footer = (
         <>
@@ -115,12 +132,22 @@ export const AduitReportFormDialog: React.FC<Props> = ({
                     <label className="block text-xs text-muted-foreground mb-1">
                         Type
                     </label>
-                    <input
-                        className="w-full border rounded px-2 py-1"
-                        value={form.type || ""}
-                        onChange={(e) => onChange({ type: e.target.value })}
+                    <Select
+                        value={form.type || undefined}
+                        onValueChange={(v) => onChange({ type: v })}
                         disabled={submitting}
-                    />
+                    >
+                        <SelectTrigger size="sm" aria-label="Audit type">
+                            <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {ALLOWED_TYPES.map((t) => (
+                                <SelectItem key={t} value={t}>
+                                    {t}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div>
@@ -218,8 +245,10 @@ export const AduitReportFormDialog: React.FC<Props> = ({
                         maxFiles={5}
                         maxSizeMB={50}
                         onFilesChanged={(files) => {
-                            // Map first file to fileKey for now; integrate upload to get a real key.
-                            onChange({ fileKey: files[0]?.name ?? "" });
+                            const first = files[0];
+                            // keep filename in form for preview, actual key set after S3 upload in handleFormSubmit
+                            onChange({ fileKey: first ? first.name : "" });
+                            onFilesChanged?.(files);
                         }}
                     />
                 </div>

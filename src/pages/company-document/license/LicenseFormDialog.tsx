@@ -17,6 +17,7 @@ interface Props {
     onClose: () => void;
     onDelete?: () => void;
     submitting?: boolean;
+    onFilesChanged?: (files: File[]) => void;
 }
 
 export const LicenseFormDialog: React.FC<Props> = ({
@@ -28,6 +29,7 @@ export const LicenseFormDialog: React.FC<Props> = ({
     onClose,
     onDelete,
     submitting = false,
+    onFilesChanged,
 }) => {
     const footer = (
         <>
@@ -178,18 +180,6 @@ export const LicenseFormDialog: React.FC<Props> = ({
                     />
                 </div>
 
-                <div className="col-span-2">
-                    <label className="block text-xs text-muted-foreground mb-1">
-                        File Key (optional)
-                    </label>
-                    <input
-                        className="w-full border rounded px-2 py-1"
-                        value={form.fileKey || ""}
-                        onChange={(e) => onChange({ fileKey: e.target.value })}
-                        disabled={submitting}
-                        placeholder="ims/private/..."
-                    />
-                </div>
                 {/* File Uploader Integration */}
                 <div className="col-span-2">
                     <label className="block text-xs text-muted-foreground mb-1">
@@ -209,6 +199,7 @@ export const LicenseFormDialog: React.FC<Props> = ({
                         onFilesChanged={(files) => {
                             const first = files[0];
                             onChange({ fileKey: first ? first.name : "" });
+                            onFilesChanged?.(files);
                         }}
                     />
                     <p className="mt-1 text-xs text-muted-foreground">

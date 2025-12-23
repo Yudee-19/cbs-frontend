@@ -27,7 +27,6 @@ export const getAuditStatusBadge = (status: string) => {
   );
 };
 
-
 export const getAuditReportColumns = (
   onView?: (row: any) => void,
   onDownload?: (row: any) => void
@@ -35,27 +34,38 @@ export const getAuditReportColumns = (
   {
     key: "auditName",
     header: "Audit Name",
+    render: (row: any) => row?.name ?? "-",
   },
   {
     key: "auditType",
     header: "Audit Type",
+    render: (row: any) => row?.type ?? "-",
   },
   {
     key: "auditPeriod",
     header: "Audit Period",
+    render: (row: any) =>
+      row?.periodStart && row?.periodEnd
+        ? `${new Date(row.periodStart).toLocaleDateString()} — ${new Date(
+            row.periodEnd
+          ).toLocaleDateString()}`
+        : "-",
   },
   {
     key: "auditor",
     header: "Auditor",
+    render: (row: any) => row?.auditor ?? "-",
   },
   {
     key: "completionDate",
     header: "Completion Date",
+    render: (row: any) =>
+      row?.completionDate ? new Date(row.completionDate).toLocaleDateString() : "-",
   },
   {
     key: "status",
     header: "Status",
-    render: (row: any) => getAuditStatusBadge(row.status),
+    render: (row: any) => getAuditStatusBadge(row?.status ?? "-"),
   },
   {
     key: "actions",
@@ -70,9 +80,13 @@ export const getAuditReportColumns = (
         />
         <ActionButtonWithTooltip
           icon={<Download size={18} />}
-          tooltip="Download Report"
-          onClick={() => onDownload?.(row)}
-          colorClass="h-7 w-7 p-0 bg-gray-100 text-primary hover:bg-green-50 hover:text-green-600 rounded-md"
+          tooltip={row?.hasFile ? "Download Report" : "No file available"}
+          onClick={() => row?.hasFile && onDownload?.(row)}
+          colorClass={`h-7 w-7 p-0 ${
+            row?.hasFile
+              ? "bg-gray-100 text-primary hover:bg-green-50 hover:text-green-600"
+              : "bg-gray-50 text-muted-foreground cursor-not-allowed"
+          } rounded-md`}
         />
       </div>
     ),
