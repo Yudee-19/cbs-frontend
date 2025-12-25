@@ -29,8 +29,6 @@ export interface TelexTransferData {
 
 export interface TelexTransferTableProps {
   transfers: TelexTransferData[];
-  loading: boolean;
-  selectedTransfer: TelexTransferData | null;
   onRowClick: (transfer: TelexTransferData) => void;
   onNewTransfer: () => void;
 }

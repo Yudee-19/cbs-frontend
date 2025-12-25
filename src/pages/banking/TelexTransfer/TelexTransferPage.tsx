@@ -8,7 +8,6 @@ import TelexRecordView from "./components/TelexRecordView";
 
 const TelexTransferPage = () => {
   const [transfers, setTransfers] = useState<TelexTransferData[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedTransfer, setSelectedTransfer] = useState<TelexTransferData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const hasFetchedRef = useRef(false);
@@ -18,15 +17,12 @@ const TelexTransferPage = () => {
     hasFetchedRef.current = true;
 
     try {
-      setLoading(true);
       const response = await listTelexTransfers(1, 200);
       setTransfers(response.items);
       // Don't auto-select first transfer - wait for user to click
     } catch (error: any) {
       console.error("Failed to fetch telex transfers:", error);
       toast.error(error?.message || "Failed to load transfers");
-    } finally {
-      setLoading(false);
     }
   }, []);
 
@@ -45,12 +41,10 @@ const TelexTransferPage = () => {
   }, [fetchTransfers]);
 
   return (
-    <div className="flex h-full bg-gray-50">
+    <div className="flex h-full bg-gray-50 gap-4">
       {/* Left Side - Table (60%) */}
       <TelexTransferTable
         transfers={transfers}
-        loading={loading}
-        selectedTransfer={selectedTransfer}
         onRowClick={handleRowClick}
         onNewTransfer={() => setShowNewModal(true)}
       />
