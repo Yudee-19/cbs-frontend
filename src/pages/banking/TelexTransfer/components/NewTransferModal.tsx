@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { X, Save, FileText } from "lucide-react";
+import { X, Save, FileText, Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,20 +15,12 @@ import { createTelexTransfer, type TelexTransferData } from "@/services/banking/
 import { listBankAccounts, type BankAccountData } from "@/services/banking/BankAccountServices";
 import { toast } from "sonner";
 import { CURRENCIES, DEFAULT_CURRENCY, AUTHORIZED_PERSONS } from "../constants";
-
-interface NewTransferModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
-}
-
-interface FormErrors {
-  [key: string]: string;
-}
+import type { NewTransferModalProps } from "../types";
 
 const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) => {
   const [loading, setLoading] = useState(false);
   const [bankAccounts, setBankAccounts] = useState<BankAccountData[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState({
     transferDate: new Date().toISOString().split('T')[0],
     senderBank: "",
@@ -43,7 +35,6 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
     authorizedBy: "",
     remarks: "",
   });
-  const [errors, setErrors] = useState<FormErrors>({});
 
   const fetchBankAccounts = useCallback(async () => {
     try {
@@ -69,9 +60,21 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
     }));
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      setSelectedFiles(prev => [...prev, ...Array.from(files)]);
+    }
+  };
 
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (isDraft: boolean = false) => {
+    const newErrors: Record<string, string> = {};
+
+    // Validate form
     if (!formData.senderBank.trim()) {
       newErrors.senderBank = "Sender Bank is required";
     }
@@ -100,14 +103,8 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
       newErrors.authorizedBy = "Authorized By is required";
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (isDraft: boolean = false) => {
-    // Validate form
-    if (!validateForm()) {
-      Object.values(errors).forEach(msg => {
+    if (Object.keys(newErrors).length > 0) {
+      Object.values(newErrors).forEach(msg => {
         if (msg) toast.error(msg);
       });
       return;
@@ -133,10 +130,11 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
       };
 
       await createTelexTransfer(transferData);
+
       toast.success(isDraft ? "Transfer saved as draft" : "Transfer submitted for approval");
       onSuccess();
       onClose();
-      setErrors({});
+      setSelectedFiles([]);
     } catch (error: any) {
       console.error("Failed to create transfer:", error);
       toast.error(error?.message || "Failed to create transfer");
@@ -204,7 +202,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
               <Input
                 value={formData.senderAccountNo}
                 onChange={(e) => setFormData(prev => ({ ...prev, senderAccountNo: e.target.value }))}
-                placeholder="e.g., contact@gmail.com"
+                placeholder="e.g., 1111-2222-3333"
                 className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
                 readOnly
               />
@@ -217,7 +215,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
               <Input
                 value={formData.beneficiaryName}
                 onChange={(e) => setFormData(prev => ({ ...prev, beneficiaryName: e.target.value }))}
-                placeholder="e.g., Po box 5389, Ai Safat 12170, Kuwait"
+                placeholder="e.g., John Doe"
                 className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
@@ -233,7 +231,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
               <Input
                 value={formData.beneficiaryBankName}
                 onChange={(e) => setFormData(prev => ({ ...prev, beneficiaryBankName: e.target.value }))}
-                placeholder="e.g., contact@gmail.com"
+                placeholder="e.g., ABC Bank"
                 className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
@@ -245,7 +243,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
               <Input
                 value={formData.beneficiaryAccountNo}
                 onChange={(e) => setFormData(prev => ({ ...prev, beneficiaryAccountNo: e.target.value }))}
-                placeholder="e.g., Po box 5389, Ai Safat 12170, Kuwait"
+                placeholder="e.g., 1111-2222-3333"
                 className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
@@ -274,7 +272,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 type="number"
                 value={formData.transferAmount}
                 onChange={(e) => setFormData(prev => ({ ...prev, transferAmount: e.target.value }))}
-                placeholder="e.g., 84645115451"
+                placeholder="e.g., 1000.00"
                 className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
@@ -305,7 +303,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
               <Input
                 value={formData.purpose}
                 onChange={(e) => setFormData(prev => ({ ...prev, purpose: e.target.value }))}
-                placeholder="e.g., 84645115451"
+                placeholder="e.g., Payment for Invoice #12345"
                 className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
@@ -336,7 +334,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
 
           {/* Remarks */}
           <div>
-            <Label className="text-sm text-[#667085] font-normal">Remarks</Label>
+            <Label className="text-sm text-[#667085] font-normal">Remarks / Notes</Label>
             <Textarea
               value={formData.remarks}
               onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
@@ -344,6 +342,56 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
               className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               rows={4}
             />
+          </div>
+
+          {/* File Upload */}
+          <div>
+            <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center bg-gray-50/50 hover:bg-gray-100/50 transition">
+              <input
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                id="file-upload"
+                disabled={loading}
+              />
+              <label
+                htmlFor="file-upload"
+                className="cursor-pointer flex items-center justify-center gap-2 text-sm text-gray-600"
+              >
+                <Upload className="h-4 w-4" />
+                <span>Click to upload or drag files</span>
+              </label>
+            </div>
+
+            {/* Selected Files List */}
+            {selectedFiles.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {selectedFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200"
+                  >
+                    <div className="flex items-center gap-2 flex-1">
+                      <FileText className="h-4 w-4 text-gray-400" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {(file.size / 1024).toFixed(2)} KB
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeFile(index)}
+                      className="ml-2 text-gray-400 hover:text-red-500 transition"
+                      type="button"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

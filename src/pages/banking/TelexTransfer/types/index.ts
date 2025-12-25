@@ -1,9 +1,17 @@
+export interface SenderBank {
+  _id?: string;
+  bankName?: string;
+  accountNumber?: string;
+  accountHolder?: string;
+}
+
 export interface TelexTransferData {
   _id?: string;
   id?: string;
+  referenceNo?: string;
   requestId?: string;
   transferDate: string;
-  senderBank: string;
+  senderBank: SenderBank | string;
   senderBankName?: string;
   senderAccountNo: string;
   beneficiaryName: string;
@@ -31,9 +39,16 @@ export interface TelexTransferTableProps {
   transfers: TelexTransferData[];
   onRowClick: (transfer: TelexTransferData) => void;
   onNewTransfer: () => void;
+  isLoading?: boolean;
 }
 
 export interface TelexRecordViewProps {
   transfer: TelexTransferData | null;
   totalTransfers: number;
+}
+
+export interface NewTransferModalProps {
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
 }

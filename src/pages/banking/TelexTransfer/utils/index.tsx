@@ -26,6 +26,6 @@ export const formatCurrency = (amount: number, currency: string): string => {
   return `${currency} ${amount.toFixed(2)}`;
 };
 
-export const getRequestId = (transfer: { _id?: string; id?: string; requestId?: string }): string => {
-  return transfer.requestId || `TT-${transfer._id?.slice(-6) || transfer.id?.slice(-6) || "000000"}`;
+export const getRequestId = (transfer: { _id?: string; id?: string; requestId?: string; referenceNo?: string }): string => {
+  return transfer.referenceNo || transfer.requestId || `TT-${transfer._id?.slice(-6) || transfer.id?.slice(-6) || "000000"}`;
 };

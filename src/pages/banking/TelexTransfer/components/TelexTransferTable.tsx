@@ -1,6 +1,7 @@
 import { Plus, Download, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/table";
+import ShimmerTable from "@/components/ui/shimmerTable";
 import type { TelexTransferTableProps } from "../types";
 import { getStatusBadge, getRequestId } from "../utils";
 
@@ -8,6 +9,7 @@ const TelexTransferTable = ({
   transfers,
   onRowClick,
   onNewTransfer,
+  isLoading,
 }: TelexTransferTableProps) => {
   const columns = [
     {
@@ -86,15 +88,19 @@ const TelexTransferTable = ({
 
       {/* Table */}
       <div className="flex-1 overflow-auto pl-4 pr-4">
-        <DataTable
-          data={transfers.map((t) => ({
-            ...t,
-            id: t._id || t.id || "",
-          }))}
-          columns={columns}
-          onRowClick={onRowClick}
-          customNoDataMessage="No transfers found"
-        />
+        {isLoading ? (
+          <ShimmerTable columnCount={7} rowCount={5} />
+        ) : (
+          <DataTable
+            data={transfers.map((t) => ({
+              ...t,
+              id: t._id || t.id || "",
+            }))}
+            columns={columns}
+            onRowClick={onRowClick}
+            customNoDataMessage="No transfers found"
+          />
+        )}
       </div>
     </div>
   );

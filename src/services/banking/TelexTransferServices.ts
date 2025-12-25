@@ -85,7 +85,7 @@ export async function getTelexTransfer(id: string) {
 export async function createTelexTransfer(
   data: Omit<TelexTransferData, "_id" | "id" | "createdAt" | "updatedAt">
 ) {
-  return handleAxios<TelexTransferData>(
+  return handleAxios<any>(
     axios.post(API_BASE, data, {
       headers: { "Content-Type": "application/json" },
     })

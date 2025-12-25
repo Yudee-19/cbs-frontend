@@ -10,6 +10,7 @@ const TelexTransferPage = () => {
   const [transfers, setTransfers] = useState<TelexTransferData[]>([]);
   const [selectedTransfer, setSelectedTransfer] = useState<TelexTransferData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const hasFetchedRef = useRef(false);
 
   const fetchTransfers = useCallback(async () => {
@@ -17,12 +18,15 @@ const TelexTransferPage = () => {
     hasFetchedRef.current = true;
 
     try {
+      setIsLoading(true);
       const response = await listTelexTransfers(1, 200);
       setTransfers(response.items);
       // Don't auto-select first transfer - wait for user to click
     } catch (error: any) {
       console.error("Failed to fetch telex transfers:", error);
       toast.error(error?.message || "Failed to load transfers");
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -36,8 +40,11 @@ const TelexTransferPage = () => {
   }, []);
 
   const handleTransferSuccess = useCallback(() => {
-    hasFetchedRef.current = false;
-    fetchTransfers();
+    // Add a small delay to ensure backend has processed the transfer and attachments
+    setTimeout(() => {
+      hasFetchedRef.current = false;
+      fetchTransfers();
+    }, 1000);
   }, [fetchTransfers]);
 
   return (
@@ -47,6 +54,7 @@ const TelexTransferPage = () => {
         transfers={transfers}
         onRowClick={handleRowClick}
         onNewTransfer={() => setShowNewModal(true)}
+        isLoading={isLoading}
       />
 
       {/* Right Side - Details (40%) */}

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
 import type { TelexRecordViewProps } from "../types";
 import { getStatusBadge, getRequestId } from "../utils";
 
@@ -45,11 +46,19 @@ const TelexRecordView = ({ transfer, totalTransfers }: TelexRecordViewProps) => 
                             </div>
                             <div>
                                 <div className="text-sm text-gray-500 mb-1 font-light">Sender Bank Name</div>
-                                <div className="font-medium text-[rgba(16,24,40,0.8)]">{transfer.senderBankName || "N/A"}</div>
+                                <div className="font-medium text-[rgba(16,24,40,0.8)]">
+                                  {typeof transfer.senderBank === 'object' 
+                                    ? transfer.senderBank?.bankName || "N/A"
+                                    : transfer.senderBankName || "N/A"}
+                                </div>
                             </div>
                             <div>
                                 <div className="text-sm text-gray-500 mb-1 font-light">Account Number</div>
-                                <div className="font-medium text-[rgba(16,24,40,0.8)]">{transfer.senderAccountNo}</div>
+                                <div className="font-medium text-[rgba(16,24,40,0.8)]">
+                                  {typeof transfer.senderBank === 'object'
+                                    ? transfer.senderBank?.accountNumber || "N/A"
+                                    : transfer.senderAccountNo}
+                                </div>
                             </div>
                             <div>
                                 <div className="text-sm text-gray-500 mb-1 font-light">Currency</div>
@@ -97,28 +106,29 @@ const TelexRecordView = ({ transfer, totalTransfers }: TelexRecordViewProps) => 
                         </div>
                     </div>
 
-                    {/* Remarks */}
-                    {transfer.remarks && (
+                    {/* Remarks / Notes and Attachments */}
+                    {(transfer.remarks || (transfer.attachments && transfer.attachments.length > 0)) && (
                         <div>
                             <h3 className="text-lg font-bold mb-4">Remarks / Notes</h3>
-                            <div className="p-4 bg-gray-50 rounded-lg text-sm border border-gray-200">
-                                {transfer.remarks}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Attachments */}
-                    {transfer.attachments && transfer.attachments.length > 0 && (
-                        <div>
-                            <h3 className="text-lg font-bold mb-4">Attachments</h3>
-                            <div className="space-y-2">
-                                {transfer.attachments.map((attachment, index) => (
-                                    <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
-                                        <span>📎</span>
-                                        <span>{attachment}</span>
-                                    </div>
-                                ))}
-                            </div>
+                            
+                            {/* Remarks Text */}
+                            {transfer.remarks && (
+                                <div className="p-4 bg-gray-50 rounded-lg text-sm border border-gray-200 mb-4">
+                                    {transfer.remarks}
+                                </div>
+                            )}
+                            
+                            {/* Attachments */}
+                            {transfer.attachments && transfer.attachments.length > 0 && (
+                                <div className="space-y-2">
+                                    {transfer.attachments.map((attachment, index) => (
+                                        <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm border border-gray-200">
+                                            <FileText className="h-4 w-4 text-gray-400" />
+                                            <span className="text-[rgba(16,24,40,0.8)]">{attachment}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
 
