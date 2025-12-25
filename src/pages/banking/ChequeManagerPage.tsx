@@ -1,6 +1,8 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import DataTable from "@/components/ui/table";
+import ShimmerTable from "@/components/ui/shimmerTable";
+import TablePagination from "@/components/ui/tablePagination";
 import { getChequeManagerColumns } from "@/components/columns/banking/chequemanager";
 import { listCheques, updateCheque, type ChequeData } from "@/services/banking/ChequeServices";
 import { toast } from "sonner";
@@ -10,6 +12,8 @@ const ChequeManagerPage = () => {
   const [loading, setLoading] = useState(true);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [editedData, setEditedData] = useState<any>({});
+  const [page, setPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
 
   const hasFetchedRef = useRef(false);
 
@@ -67,9 +71,10 @@ const ChequeManagerPage = () => {
 
   const handleSave = useCallback(async (row: any) => {
     try {
-      // Update the cheque via API
+      // Update the cheque via API with both printStatus and transactionStatus
       await updateCheque(row.id, {
         printStatus: editedData.printStatus as any,
+        transactionStatus: editedData.transactionStatus,
       });
 
       // Update local state
@@ -135,6 +140,13 @@ const ChequeManagerPage = () => {
     editingRowId
   );
 
+  const total = cheques.length;
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    return cheques.slice(start, start + rowsPerPage);
+  }, [cheques, page, rowsPerPage]);
+
   return (
     <div className="p-2 sm:p-4 h-full flex flex-col">
       <Card className="shadow-sm flex flex-col h-full bg-white overflow-hidden gap-0">
@@ -149,9 +161,7 @@ const ChequeManagerPage = () => {
         <CardContent className="flex-1 overflow-hidden p-0">
           <div className="overflow-x-auto h-full px-2 sm:px-4">
             {loading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="text-gray-500">Loading cheques...</div>
-              </div>
+              <ShimmerTable columnCount={6} rowCount={10} />
             ) : cheques.length === 0 ? (
               <div className="flex items-center justify-center h-64">
                 <div className="text-gray-500">No cheques found</div>
@@ -159,11 +169,24 @@ const ChequeManagerPage = () => {
             ) : (
               <DataTable
                 columns={columns}
-                data={cheques}
+                data={paginated}
               />
             )}
           </div>
         </CardContent>
+
+        <div className="border-t bg-white sticky bottom-0 z-20 px-2 sm:px-4">
+          <TablePagination
+            total={total}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={(p: number) => setPage(p)}
+            onRowsPerPageChange={(r: number) => {
+              setRowsPerPage(r);
+              setPage(1);
+            }}
+          />
+        </div>
       </Card>
     </div>
   );

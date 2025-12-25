@@ -9,6 +9,7 @@ export type ChequeData = {
   chequeDate: string;
   address?: string;
   printStatus?: "Printed" | "Not Printed";
+  transactionStatus?: string;
   createdAt?: string;
   updatedAt?: string;
 };
