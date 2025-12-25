@@ -155,16 +155,13 @@ export const getChequeManagerColumns = (
             }
             
             return (
-                <div 
-                    className="flex gap-2"
-                    onClick={() => onEdit?.(row)}
-                >
+                <div className="flex gap-2">
                     <ActionButtonWithTooltip
                         icon={<Edit size={18} />}
                         tooltip="Edit"
                         colorClass="h-7 w-7 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md"
+                        onClick={() => onEdit?.(row)}
                     />
-                    <span className="text-sm text-blue-600 py-1 font-medium">Edit</span>
                 </div>
             );
         },
