@@ -1,7 +1,9 @@
+import { useState, useMemo } from "react";
 import { Plus, Download, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/table";
 import ShimmerTable from "@/components/ui/shimmerTable";
+import TablePagination from "@/components/ui/tablePagination";
 import type { TelexTransferTableProps } from "../types";
 import { getStatusBadge, getRequestId } from "../utils";
 
@@ -11,6 +13,16 @@ const TelexTransferTable = ({
   onNewTransfer,
   isLoading,
 }: TelexTransferTableProps) => {
+  const [page, setPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
+  const total = transfers.length;
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    return transfers.slice(start, start + rowsPerPage);
+  }, [transfers, page, rowsPerPage]);
+
   const columns = [
     {
       key: "requestId",
@@ -92,7 +104,7 @@ const TelexTransferTable = ({
           <ShimmerTable columnCount={7} rowCount={5} />
         ) : (
           <DataTable
-            data={transfers.map((t) => ({
+            data={paginated.map((t) => ({
               ...t,
               id: t._id || t.id || "",
             }))}
@@ -101,6 +113,20 @@ const TelexTransferTable = ({
             customNoDataMessage="No transfers found"
           />
         )}
+      </div>
+
+      {/* Pagination */}
+      <div className="border-t bg-white p-4 pt-0 pb-2 rounded-b-xl">
+        <TablePagination
+          total={total}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(p: number) => setPage(p)}
+          onRowsPerPageChange={(r: number) => {
+            setRowsPerPage(r);
+            setPage(1);
+          }}
+        />
       </div>
     </div>
   );

@@ -96,7 +96,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 type="date"
                 value={formData.transferDate}
                 onChange={(e) => setFormData(prev => ({ ...prev, transferDate: e.target.value }))}
-                className="w-full border border-gray-200 rounded-lg px-2 py-2 bg-[rgba(102,112,133,0.04)] mt-1 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+                className="w-full border border-gray-200 rounded-lg px-2 py-2 bg-[rgba(102,112,133,0.04)] mt-1 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]"
               />
             </div>
             <div>
@@ -105,7 +105,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 <span className="text-[#667085]">*</span>
               </Label>
               <Select value={formData.senderBank} onValueChange={handleSenderBankChange}>
-                <SelectTrigger className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]">
+                <SelectTrigger className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]">
                   <SelectValue placeholder="e.g., ABC Corporation" />
                 </SelectTrigger>
                 <SelectContent>
@@ -130,7 +130,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 value={formData.senderAccountNo}
                 onChange={(e) => setFormData(prev => ({ ...prev, senderAccountNo: e.target.value }))}
                 placeholder="e.g., 1111-2222-3333"
-                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]"
                 readOnly
               />
             </div>
@@ -143,7 +143,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 value={formData.beneficiaryName}
                 onChange={(e) => setFormData(prev => ({ ...prev, beneficiaryName: e.target.value }))}
                 placeholder="e.g., John Doe"
-                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]"
               />
             </div>
           </div>
@@ -159,7 +159,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 value={formData.beneficiaryBankName}
                 onChange={(e) => setFormData(prev => ({ ...prev, beneficiaryBankName: e.target.value }))}
                 placeholder="e.g., ABC Bank"
-                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]"
               />
             </div>
             <div>
@@ -171,7 +171,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 value={formData.beneficiaryAccountNo}
                 onChange={(e) => setFormData(prev => ({ ...prev, beneficiaryAccountNo: e.target.value }))}
                 placeholder="e.g., 1111-2222-3333"
-                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]"
               />
             </div>
           </div>
@@ -187,7 +187,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 value={formData.swiftCode}
                 onChange={(e) => setFormData(prev => ({ ...prev, swiftCode: e.target.value }))}
                 placeholder="e.g., ABCDEFGH"
-                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]"
               />
             </div>
             <div>
@@ -200,7 +200,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 value={formData.transferAmount}
                 onChange={(e) => setFormData(prev => ({ ...prev, transferAmount: e.target.value }))}
                 placeholder="e.g., 1000.00"
-                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]"
               />
             </div>
           </div>
@@ -210,7 +210,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
             <div>
               <Label className="text-sm text-[#667085] font-normal">Currency</Label>
               <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
-                <SelectTrigger className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]">
+                <SelectTrigger className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -231,7 +231,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 value={formData.purpose}
                 onChange={(e) => setFormData(prev => ({ ...prev, purpose: e.target.value }))}
                 placeholder="e.g., Payment for Invoice #12345"
-                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]"
               />
             </div>
           </div>
@@ -245,7 +245,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 <span className="text-[#667085]">*</span>
               </Label>
               <Select value={formData.authorizedBy} onValueChange={(value) => setFormData(prev => ({ ...prev, authorizedBy: value }))}>
-                <SelectTrigger className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]">
+                <SelectTrigger className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]">
                   <SelectValue placeholder="Select Authorizer" />
                 </SelectTrigger>
                 <SelectContent>
@@ -266,7 +266,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
               value={formData.remarks}
               onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
               placeholder="Remarks..."
-              className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+              className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.5)]"
               rows={4}
             />
           </div>
