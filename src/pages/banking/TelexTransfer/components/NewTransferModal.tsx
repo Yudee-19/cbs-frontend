@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { X, Save, FileText, Upload, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { X, Save, FileText, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,48 +11,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createTelexTransfer, type TelexTransferData } from "@/services/banking/TelexTransferServices";
-import { listBankAccounts, type BankAccountData } from "@/services/banking/BankAccountServices";
+import { createTelexTransfer } from "@/services/banking/TelexTransferServices";
 import { toast } from "sonner";
-import { CURRENCIES, DEFAULT_CURRENCY, AUTHORIZED_PERSONS } from "../constants";
+import { CURRENCIES, AUTHORIZED_PERSONS } from "../constants";
 import type { NewTransferModalProps } from "../types";
+import { useBankAccounts } from "../hooks/useBankAccounts";
+import {
+  validateTransferForm,
+  showValidationErrors,
+  transformFormToTransferData,
+  getSelectedBankDetails,
+  getInitialFormData,
+  type TransferFormData,
+} from "../utils";
 
 const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) => {
   const [loading, setLoading] = useState(false);
-  const [bankAccounts, setBankAccounts] = useState<BankAccountData[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [formData, setFormData] = useState({
-    transferDate: new Date().toISOString().split('T')[0],
-    senderBank: "",
-    senderAccountNo: "",
-    beneficiaryName: "",
-    beneficiaryBankName: "",
-    beneficiaryAccountNo: "",
-    swiftCode: "",
-    transferAmount: "",
-    currency: DEFAULT_CURRENCY,
-    purpose: "",
-    authorizedBy: "",
-    remarks: "",
-  });
-
-  const fetchBankAccounts = useCallback(async () => {
-    try {
-      const response = await listBankAccounts(1, 100);
-      setBankAccounts(response.items);
-    } catch (error) {
-      console.error("Failed to fetch bank accounts:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (open) {
-      fetchBankAccounts();
-    }
-  }, [open, fetchBankAccounts]);
+  const [formData, setFormData] = useState<TransferFormData>(getInitialFormData());
+  const { bankAccounts } = useBankAccounts(open);
 
   const handleSenderBankChange = (bankId: string) => {
-    const selectedBank = bankAccounts.find(b => b._id === bankId || b.id === bankId);
+    const selectedBank = getSelectedBankDetails(bankId, bankAccounts);
     setFormData(prev => ({
       ...prev,
       senderBank: bankId,
@@ -60,75 +40,22 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
     }));
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      setSelectedFiles(prev => [...prev, ...Array.from(files)]);
-    }
-  };
-
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (isDraft: boolean = false) => {
-    const newErrors: Record<string, string> = {};
-
     // Validate form
-    if (!formData.senderBank.trim()) {
-      newErrors.senderBank = "Sender Bank is required";
-    }
-    if (!formData.senderAccountNo.trim()) {
-      newErrors.senderAccountNo = "Sender Account No. is required";
-    }
-    if (!formData.beneficiaryName.trim()) {
-      newErrors.beneficiaryName = "Beneficiary Name is required";
-    }
-    if (!formData.beneficiaryBankName.trim()) {
-      newErrors.beneficiaryBankName = "Beneficiary Bank Name is required";
-    }
-    if (!formData.beneficiaryAccountNo.trim()) {
-      newErrors.beneficiaryAccountNo = "Beneficiary Account No. is required";
-    }
-    if (!formData.swiftCode.trim()) {
-      newErrors.swiftCode = "SWIFT/IBAN Code is required";
-    }
-    if (!formData.transferAmount || isNaN(parseFloat(formData.transferAmount))) {
-      newErrors.transferAmount = "Transfer Amount must be a valid number";
-    }
-    if (!formData.purpose.trim()) {
-      newErrors.purpose = "Purpose is required";
-    }
-    if (!formData.authorizedBy.trim()) {
-      newErrors.authorizedBy = "Authorized By is required";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      Object.values(newErrors).forEach(msg => {
-        if (msg) toast.error(msg);
-      });
+    const validationErrors = validateTransferForm(formData);
+    
+    if (Object.keys(validationErrors).length > 0) {
+      showValidationErrors(validationErrors);
       return;
     }
 
     try {
       setLoading(true);
-
-      const transferData: Omit<TelexTransferData, "_id" | "id" | "createdAt" | "updatedAt"> = {
-        transferDate: new Date(formData.transferDate).toISOString(),
-        senderBank: formData.senderBank,
-        senderAccountNo: formData.senderAccountNo,
-        beneficiaryName: formData.beneficiaryName,
-        beneficiaryBankName: formData.beneficiaryBankName,
-        beneficiaryAccountNo: formData.beneficiaryAccountNo,
-        swiftCode: formData.swiftCode,
-        transferAmount: parseFloat(formData.transferAmount),
-        currency: formData.currency,
-        purpose: formData.purpose,
-        authorizedBy: formData.authorizedBy || undefined,
-        remarks: formData.remarks || undefined,
-        status: isDraft ? "Draft" : "Pending",
-      };
-
+      const transferData = transformFormToTransferData(formData, isDraft);
       await createTelexTransfer(transferData);
 
       toast.success(isDraft ? "Transfer saved as draft" : "Transfer submitted for approval");

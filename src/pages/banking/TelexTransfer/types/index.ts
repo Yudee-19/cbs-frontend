@@ -52,3 +52,19 @@ export interface NewTransferModalProps {
   onClose: () => void;
   onSuccess: () => void;
 }
+
+// Form validation utility
+export interface TransferFormData {
+  transferDate: string;
+  senderBank: string;
+  senderAccountNo: string;
+  beneficiaryName: string;
+  beneficiaryBankName: string;
+  beneficiaryAccountNo: string;
+  swiftCode: string;
+  transferAmount: string;
+  currency: string;
+  purpose: string;
+  authorizedBy: string;
+  remarks: string;
+}
