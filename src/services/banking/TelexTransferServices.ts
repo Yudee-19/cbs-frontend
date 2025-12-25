@@ -1,4 +1,5 @@
 import axios, { type AxiosResponse } from "axios";
+import { API_URLS } from "@/constants/url-constants";
 
 export type TelexTransferData = {
   _id?: string;
@@ -34,7 +35,7 @@ export type TelexTransferListResponse = {
   total: number;
 };
 
-const API_BASE = "https://company-documnets.onrender.com/api/telex-transfers";
+const API_BASE = API_URLS.BANKING.TELEX_TRANSFERS;
 
 async function handleAxios<T = any>(p: Promise<AxiosResponse<T>>): Promise<T> {
   try {
