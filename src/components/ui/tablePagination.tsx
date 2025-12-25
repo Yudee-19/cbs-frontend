@@ -15,6 +15,7 @@ export interface TablePaginationProps {
   rowsPerPage: number;
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rows: number) => void;
+  className?: string;
 }
 
 const TablePagination: React.FC<TablePaginationProps> = ({
@@ -23,6 +24,7 @@ const TablePagination: React.FC<TablePaginationProps> = ({
   rowsPerPage,
   onPageChange,
   onRowsPerPageChange,
+  className,
 }) => {
   const totalPages = Math.ceil(total / rowsPerPage);
   const start = (page - 1) * rowsPerPage + 1;
@@ -61,7 +63,7 @@ const TablePagination: React.FC<TablePaginationProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-center sm:justify-between gap-2 mt-3 text-xs text-gray-600">
+    <div className={`flex flex-wrap items-center justify-center sm:justify-between gap-2 mt-3 text-xs text-gray-600 ${className}`}>
       {/* Rows per page */}
       <div className="flex items-center gap-1">
         <span className="hidden sm:inline">Rows:</span>

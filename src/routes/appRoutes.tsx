@@ -18,15 +18,8 @@ const SoftwarePage = lazy(() => import("@/pages/it/software/SoftwarePages"));
 
 const Equipment = lazy(() => import("@/pages/it/Equipment/EquipmentPage"));
 
-const ItSupport = lazy(() => import("@/pages/it/itSupport/ItSupportPage"));
-
-const SimPage = lazy(() => import("@/pages/it/Sim/Simpage"));
-
-const HardwareTransferPage = lazy(
-    () => import("@/pages/it/HardwareTansfer/HardwareTansferPage")
-);
-const LandBuildingPage = lazy(
-    () => import("@/pages/assets/LandBuilding/LandBuildingPage")
+const TelexTransferPage = lazy(
+    () => import("@/pages/banking/TelexTransfer/TelexTransferPage")
 );
 const VehiclePage = lazy(() => import("@/pages/assets/Vechicle/VechiclePage"));
 const EquipmentPage = lazy(
@@ -63,7 +56,14 @@ const ChequeManagerPage = lazy(
 const MyAttendance = lazy(() => import("@/pages/myAttendance/MyAttendance"));
 const LeaveRequest = lazy(() => import("@/pages/leaveRequest/LeaveRequest"));
 const DashboardPage = lazy(() => import("@/pages/dashboard/dashboardPage"));
-
+const LandBuildingPage = lazy(
+    () => import("@/pages/assets/LandBuilding/LandBuildingPage")
+);
+const ItSupport = lazy(() => import("@/pages/it/itSupport/ItSupportPage"));
+const SimPage = lazy(() => import("@/pages/it/Sim/Simpage"));
+const HardwareTransferPage = lazy(
+    () => import("@/pages/it/HardwareTansfer/HardwareTansferPage")
+);
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -139,6 +139,14 @@ export const router = createBrowserRouter([
                 element: (
                     <Suspense fallback={<LoadingFallback />}>
                         <ChequeManagerPage />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "/banking/telex-transfer",
+                element: (
+                    <Suspense fallback={<LoadingFallback />}>
+                        <TelexTransferPage />
                     </Suspense>
                 ),
             },
