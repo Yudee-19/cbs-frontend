@@ -346,7 +346,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
 
           {/* File Upload */}
           <div>
-            <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center bg-gray-50/50 hover:bg-gray-100/50 transition">
+            {/* <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center bg-gray-50/50 hover:bg-gray-100/50 transition">
               <input
                 type="file"
                 multiple
@@ -362,7 +362,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 <Upload className="h-4 w-4" />
                 <span>Click to upload or drag files</span>
               </label>
-            </div>
+            </div> */}
 
             {/* Selected Files List */}
             {selectedFiles.length > 0 && (
