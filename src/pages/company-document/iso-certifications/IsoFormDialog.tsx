@@ -5,6 +5,13 @@ import { DialogClose } from "@/components/ui/dialog";
 import type { IsoData } from "@/services/company-documents/IsoServices";
 import { Loader2 } from "lucide-react";
 import { FileUploader } from "@/components/ui/FileUploader";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Mode = "add" | "edit";
 
@@ -17,7 +24,16 @@ interface Props {
     onClose: () => void;
     onDelete?: () => void;
     submitting?: boolean;
+    onFilesChanged?: (files: File[]) => void;
 }
+
+const ALLOWED_ISO_STANDARDS = [
+  "ISO 9001:2015",
+  "ISO 14001:2015",
+  "ISO 27001:2013",
+  "ISO 45001:2018",
+  "ISO 50001:2018",
+];
 
 export const IsoFormDialog: React.FC<Props> = ({
     open,
@@ -28,6 +44,7 @@ export const IsoFormDialog: React.FC<Props> = ({
     onClose,
     onDelete,
     submitting = false,
+    onFilesChanged,
 }) => {
     const footer = (
         <>
@@ -119,14 +136,22 @@ export const IsoFormDialog: React.FC<Props> = ({
                     <label className="block text-xs text-muted-foreground mb-1">
                         ISO Standard
                     </label>
-                    <input
-                        className="w-full border rounded px-2 py-1"
-                        value={form.isoStandard || ""}
-                        onChange={(e) =>
-                            onChange({ isoStandard: e.target.value })
-                        }
+                    <Select
+                        value={form.isoStandard || undefined}
+                        onValueChange={(v) => onChange({ isoStandard: v })}
                         disabled={submitting}
-                    />
+                    >
+                        <SelectTrigger size="sm" aria-label="ISO standard">
+                            <SelectValue placeholder="Select ISO standard" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {ALLOWED_ISO_STANDARDS.map((s) => (
+                                <SelectItem key={s} value={s}>
+                                    {s}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div>
@@ -203,6 +228,7 @@ export const IsoFormDialog: React.FC<Props> = ({
                         onFilesChanged={(files) => {
                             const first = files[0];
                             onChange({ fileKey: first ? first.name : "" });
+                            onFilesChanged?.(files);
                         }}
                     />
                     <p className="mt-1 text-xs text-muted-foreground">

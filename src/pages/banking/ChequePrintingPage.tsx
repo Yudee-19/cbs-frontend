@@ -79,7 +79,7 @@ const ChequePrintingPage = () => {
                 size="sm"
                 aria-label="Cheque Manager"
                 title="Cheque Manager"
-                onClick={() => console.log("Open Cheque Manager")}
+                onClick={() => navigate("/banking/cheque-printing/cheque-manager")}
               >
                 <List className="h-4 w-4" />
                 <span className="hidden sm:inline">Cheque Manager</span>
