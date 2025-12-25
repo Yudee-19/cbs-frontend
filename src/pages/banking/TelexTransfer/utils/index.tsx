@@ -16,7 +16,7 @@ export const getStatusBadge = (status: string) => {
   }
 
   return (
-    <span className={`px-3 py-1 rounded text-xs font-medium ${cls}`}>
+    <span className={`px-3 py-1 rounded-xl text-xs font-medium ${cls}`}>
       {status}
     </span>
   );

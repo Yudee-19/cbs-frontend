@@ -13,27 +13,29 @@ const TelexTransferTable = ({
     {
       key: "requestId",
       header: "Request ID",
-      render: (row: any) => getRequestId(row),
+      render: (row: any) => <div className="text-[#101828]">{getRequestId(row)}</div>,
     },
     {
       key: "transferDate",
       header: "Date",
-      render: (row: any) => new Date(row.transferDate).toLocaleDateString(),
+      render: (row: any) => <div className="text-[#101828]">{new Date(row.transferDate).toLocaleDateString()}</div>,
     },
     {
       key: "beneficiaryName",
       header: "Beneficiary",
+      render: (row: any) => <div className="text-[#101828]">{row.beneficiaryName}</div>,
     },
     {
       key: "beneficiaryBankName",
       header: "Bank",
+      render: (row: any) => <div className="text-[#101828]">{row.beneficiaryBankName}</div>,
     },
     {
       key: "transferAmount",
       header: "Amount",
       render: (row: any) => (
         <div className="flex flex-col">
-          <div className="font-semibold">
+          <div className="text-[#101828]">
             {row.currency} {row.transferAmount.toFixed(2)}
           </div>
           <div className="text-xs text-gray-500">
@@ -45,12 +47,12 @@ const TelexTransferTable = ({
     {
       key: "status",
       header: "Status",
-      render: (row: any) => getStatusBadge(row.status || "Draft"),
+      render: (row: any) => <div className="text-[#101828]">{getStatusBadge(row.status || "Draft")}</div>,
     },
     {
       key: "authorizedBy",
       header: "Auth By",
-      render: (row: any) => row.authorizedBy || "Pending",
+      render: (row: any) => <div className="text-[#101828]">{row.authorizedBy || "Pending"}</div>,
     },
   ];
 
@@ -60,12 +62,12 @@ const TelexTransferTable = ({
       <div className="pl-4 pr-4 pt-4 pb-2">
         <div className="flex items-center justify-between">
           <div className="text-sm font-semibold text-gray-900">
-            ROLE : ADMIN
+            ROLE : USER
           </div>
           <div className="flex gap-2">
             <Button
               onClick={onNewTransfer}
-              className="bg-primary hover:bg-blue-700 text-white"
+              className="bg-primary hover:bg-blue-800 text-white"
             >
               <Plus className="h-4 w-4" />
               New Transfer

@@ -22,6 +22,10 @@ interface NewTransferModalProps {
   onSuccess: () => void;
 }
 
+interface FormErrors {
+  [key: string]: string;
+}
+
 const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) => {
   const [loading, setLoading] = useState(false);
   const [bankAccounts, setBankAccounts] = useState<BankAccountData[]>([]);
@@ -39,6 +43,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
     authorizedBy: "",
     remarks: "",
   });
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const fetchBankAccounts = useCallback(async () => {
     try {
@@ -64,11 +69,53 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
     }));
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.senderBank.trim()) {
+      newErrors.senderBank = "Sender Bank is required";
+    }
+    if (!formData.senderAccountNo.trim()) {
+      newErrors.senderAccountNo = "Sender Account No. is required";
+    }
+    if (!formData.beneficiaryName.trim()) {
+      newErrors.beneficiaryName = "Beneficiary Name is required";
+    }
+    if (!formData.beneficiaryBankName.trim()) {
+      newErrors.beneficiaryBankName = "Beneficiary Bank Name is required";
+    }
+    if (!formData.beneficiaryAccountNo.trim()) {
+      newErrors.beneficiaryAccountNo = "Beneficiary Account No. is required";
+    }
+    if (!formData.swiftCode.trim()) {
+      newErrors.swiftCode = "SWIFT/IBAN Code is required";
+    }
+    if (!formData.transferAmount || isNaN(parseFloat(formData.transferAmount))) {
+      newErrors.transferAmount = "Transfer Amount must be a valid number";
+    }
+    if (!formData.purpose.trim()) {
+      newErrors.purpose = "Purpose is required";
+    }
+    if (!formData.authorizedBy.trim()) {
+      newErrors.authorizedBy = "Authorized By is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (isDraft: boolean = false) => {
+    // Validate form
+    if (!validateForm()) {
+      Object.values(errors).forEach(msg => {
+        if (msg) toast.error(msg);
+      });
+      return;
+    }
+
     try {
       setLoading(true);
 
-      // TODO: Confirm swiftCode hardcoded value with team
       const transferData: Omit<TelexTransferData, "_id" | "id" | "createdAt" | "updatedAt"> = {
         transferDate: new Date(formData.transferDate).toISOString(),
         senderBank: formData.senderBank,
@@ -76,7 +123,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
         beneficiaryName: formData.beneficiaryName,
         beneficiaryBankName: formData.beneficiaryBankName,
         beneficiaryAccountNo: formData.beneficiaryAccountNo,
-        swiftCode: "0000",
+        swiftCode: formData.swiftCode,
         transferAmount: parseFloat(formData.transferAmount),
         currency: formData.currency,
         purpose: formData.purpose,
@@ -89,6 +136,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
       toast.success(isDraft ? "Transfer saved as draft" : "Transfer submitted for approval");
       onSuccess();
       onClose();
+      setErrors({});
     } catch (error: any) {
       console.error("Failed to create transfer:", error);
       toast.error(error?.message || "Failed to create transfer");
@@ -101,9 +149,9 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] overflow-auto shadow-lg">
+      <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-auto shadow-lg">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white">
+        <div className="flex items-center justify-between p-4 pb-2 sticky top-0 bg-white">
           <h2 className="text-xl font-semibold">New Telex Transfer</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X className="h-5 w-5" />
@@ -111,23 +159,28 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
         </div>
 
         {/* Form */}
-        <div className="p-6 space-y-6">
+        <div className="p-4 space-y-4">
           {/* Row 1 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm text-gray-600">Transfer Date</Label>
-              <Input
+              <Label className="text-sm text-[#667085] font-normal">
+                Transfer Date
+                <span className="text-[#667085]">*</span>
+              </Label>
+              <input
                 type="date"
                 value={formData.transferDate}
                 onChange={(e) => setFormData(prev => ({ ...prev, transferDate: e.target.value }))}
-                placeholder="e.g., John Doe"
-                className="mt-1"
+                className="w-full border border-gray-200 rounded-lg px-2 py-2 bg-[rgba(102,112,133,0.04)] mt-1 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
             <div>
-              <Label className="text-sm text-gray-600">Sender Bank Name</Label>
+              <Label className="text-sm text-[#667085] font-normal">
+                Sender Bank Name
+                <span className="text-[#667085]">*</span>
+              </Label>
               <Select value={formData.senderBank} onValueChange={handleSenderBankChange}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]">
                   <SelectValue placeholder="e.g., ABC Corporation" />
                 </SelectTrigger>
                 <SelectContent>
@@ -144,22 +197,28 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
           {/* Row 2 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm text-gray-600">Sender Account No.</Label>
+              <Label className="text-sm text-[#667085] font-normal">
+                Sender Account No.
+                <span className="text-[#667085]">*</span>
+              </Label>
               <Input
                 value={formData.senderAccountNo}
                 onChange={(e) => setFormData(prev => ({ ...prev, senderAccountNo: e.target.value }))}
                 placeholder="e.g., contact@gmail.com"
-                className="mt-1"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
                 readOnly
               />
             </div>
             <div>
-              <Label className="text-sm text-gray-600">Beneficiary Name</Label>
+              <Label className="text-sm text-[#667085] font-normal">
+                Beneficiary Name
+                <span className="text-[#667085]">*</span>
+              </Label>
               <Input
                 value={formData.beneficiaryName}
                 onChange={(e) => setFormData(prev => ({ ...prev, beneficiaryName: e.target.value }))}
                 placeholder="e.g., Po box 5389, Ai Safat 12170, Kuwait"
-                className="mt-1"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
           </div>
@@ -167,21 +226,56 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
           {/* Row 3 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm text-gray-600">Beneficiary Bank Name</Label>
+              <Label className="text-sm text-[#667085] font-normal">
+                Beneficiary Bank Name
+                <span className="text-[#667085]">*</span>
+              </Label>
               <Input
                 value={formData.beneficiaryBankName}
                 onChange={(e) => setFormData(prev => ({ ...prev, beneficiaryBankName: e.target.value }))}
                 placeholder="e.g., contact@gmail.com"
-                className="mt-1"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
             <div>
-              <Label className="text-sm text-gray-600">Beneficiary Account No.</Label>
+              <Label className="text-sm text-[#667085] font-normal">
+                Beneficiary Account No.
+                <span className="text-[#667085]">*</span>
+              </Label>
               <Input
                 value={formData.beneficiaryAccountNo}
                 onChange={(e) => setFormData(prev => ({ ...prev, beneficiaryAccountNo: e.target.value }))}
                 placeholder="e.g., Po box 5389, Ai Safat 12170, Kuwait"
-                className="mt-1"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+              />
+            </div>
+          </div>
+
+          {/* Row 3a - SWIFT/IBAN Code */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm text-[#667085] font-normal">
+                SWIFT/IBAN Code
+                <span className="text-[#667085]">*</span>
+              </Label>
+              <Input
+                value={formData.swiftCode}
+                onChange={(e) => setFormData(prev => ({ ...prev, swiftCode: e.target.value }))}
+                placeholder="e.g., ABCDEFGH"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
+              />
+            </div>
+            <div>
+              <Label className="text-sm text-[#667085] font-normal">
+                Transfer Amount
+                <span className="text-[#667085]">*</span>
+              </Label>
+              <Input
+                type="number"
+                value={formData.transferAmount}
+                onChange={(e) => setFormData(prev => ({ ...prev, transferAmount: e.target.value }))}
+                placeholder="e.g., 84645115451"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
           </div>
@@ -189,19 +283,9 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
           {/* Row 4 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm text-gray-600">Transfer Amount</Label>
-              <Input
-                type="number"
-                value={formData.transferAmount}
-                onChange={(e) => setFormData(prev => ({ ...prev, transferAmount: e.target.value }))}
-                placeholder="e.g., 84645115451"
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label className="text-sm text-gray-600">Currency</Label>
+              <Label className="text-sm text-[#667085] font-normal">Currency</Label>
               <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -213,23 +297,30 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          {/* Row 5 */}
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm text-gray-600">Purpose of Transfer</Label>
+              <Label className="text-sm text-[#667085] font-normal">
+                Purpose of Transfer
+                <span className="text-[#667085]">*</span>
+              </Label>
               <Input
                 value={formData.purpose}
                 onChange={(e) => setFormData(prev => ({ ...prev, purpose: e.target.value }))}
                 placeholder="e.g., 84645115451"
-                className="mt-1"
+                className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               />
             </div>
+          </div>
+
+          {/* Row 5 */}
+          <div className="grid grid-cols-2 gap-4">
+            
             <div>
-              <Label className="text-sm text-gray-600">Authorized By</Label>
+              <Label className="text-sm text-[#667085] font-normal">
+                Authorized By
+                <span className="text-[#667085]">*</span>
+              </Label>
               <Select value={formData.authorizedBy} onValueChange={(value) => setFormData(prev => ({ ...prev, authorizedBy: value }))}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]">
                   <SelectValue placeholder="Select Authorizer" />
                 </SelectTrigger>
                 <SelectContent>
@@ -245,25 +336,25 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
 
           {/* Remarks */}
           <div>
-            <Label className="text-sm text-gray-600">Remarks</Label>
+            <Label className="text-sm text-[#667085] font-normal">Remarks</Label>
             <Textarea
               value={formData.remarks}
               onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
               placeholder="Remarks..."
-              className="mt-1"
+              className="mt-1 bg-[rgba(102,112,133,0.04)] border-gray-200 text-[rgba(16,24,40,0.8)] placeholder:text-[rgba(16,24,40,0.8)]"
               rows={4}
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t bg-gray-50">
+        <div className="flex items-center justify-between p-4 pt-0 gap-4">
           <div className="flex gap-3">
             <Button
               variant="outline"
               onClick={onClose}
               disabled={loading}
-              className="gap-2"
+              className="gap-2 w-[184px] shadow=[0px 4px 4px 0px #0000000A] border-none"
             >
               <X className="h-4 w-4" />
               Cancel
@@ -272,7 +363,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
               variant="outline"
               onClick={() => handleSubmit(true)}
               disabled={loading}
-              className="gap-2"
+              className="gap-2 w-[191px] shadow=[0px 4px 4px 0px #0000000A] border-none"
             >
               <FileText className="h-4 w-4" />
               Save Draft
@@ -281,7 +372,7 @@ const NewTransferModal = ({ open, onClose, onSuccess }: NewTransferModalProps) =
           <Button
             onClick={() => handleSubmit(false)}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+            className="bg-primary hover:bg-blue-800 text-white gap-2 flex-1 ml-auto"
           >
             <Save className="h-4 w-4" />
             Submit For Approval
