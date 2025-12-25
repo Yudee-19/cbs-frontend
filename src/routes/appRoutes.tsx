@@ -42,6 +42,7 @@ const ISOCertificationsPage = lazy(() => import('@/pages/company-document/iso-ce
 const ChequePrintingPage = lazy(()=> import('@/pages/banking/ChequePrintingPage'));
 const BusinessContactsPage = lazy(() => import('@/pages/banking/BusinessContactsPage'));
 const NewChequePage = lazy(()=> import('@/pages/banking/NewChequePage'));
+const TelexTransferPage = lazy(()=> import('@/pages/banking/TelexTransfer/TelexTransferPage'));
 
 export const router = createBrowserRouter([
   {
@@ -91,6 +92,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingFallback />}>
             <NewChequePage />
+          </Suspense>
+        )
+      },
+      {
+        path: '/banking/telex-transfer',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <TelexTransferPage />
           </Suspense>
         )
       },
