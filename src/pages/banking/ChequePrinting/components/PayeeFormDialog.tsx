@@ -18,7 +18,10 @@ type Mode = "add" | "edit" | "view";
 const PAYEE_FORM_STYLES = `
   input::placeholder,
   textarea::placeholder {
-    color: rgba(16, 24, 40, 0.8) !important;
+    color: rgba(16, 24, 40, 0.5) !important;
+  }
+  [data-placeholder] {
+    color: rgba(16, 24, 40, 0.5) !important;
   }
 `;
 

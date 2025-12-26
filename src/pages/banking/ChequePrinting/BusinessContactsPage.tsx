@@ -249,8 +249,8 @@ const BusinessContactsPage = () => {
             </div>
           </div>
 
-          <CardContent className="flex-1 overflow-hidden px-2 sm:px-4">
-            <TabsContent value="banks" className="flex-1 overflow-hidden">
+          <CardContent className="flex-1 overflow-hidden px-2 sm:px-4 p-0">
+            <TabsContent value="banks" className="flex-1 overflow-hidden h-full">
               <BankAccountsTab
                 key={refreshBankTrigger}
                 onEdit={handleEditBank}
@@ -258,7 +258,7 @@ const BusinessContactsPage = () => {
               />
             </TabsContent>
 
-            <TabsContent value="payees" className="flex-1 overflow-hidden">
+            <TabsContent value="payees" className="flex-1 overflow-hidden h-full">
               <PayeesTab
                 key={refreshPayeeTrigger}
                 onEdit={handleEditPayee}
