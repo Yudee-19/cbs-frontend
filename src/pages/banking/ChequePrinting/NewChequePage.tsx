@@ -4,7 +4,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { Card, CardContent } from "@/components/ui/card";
 import ChequeForm from "./components/ChequeForm";
 import ChequePreview from "./components/ChequePreview";
-import { convertAmountToWordsWithDecimals } from "../../lib/utils";
+import { convertAmountToWordsWithDecimals } from "../../../lib/utils";
 import type { ChequeFormData, FieldPositions } from "./types/types";
 import {
   defaultChequeFormData,

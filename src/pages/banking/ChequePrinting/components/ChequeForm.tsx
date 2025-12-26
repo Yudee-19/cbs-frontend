@@ -141,7 +141,7 @@ const ChequeForm = ({
           placeholder="Enter payee name"
           value={formData.payeeName}
           onChange={(e) => onInputChange("payeeName", e.target.value)}
-          className="w-full bg-gray-50 shadow-none placeholder:text-gray-700"
+          className="w-full bg-gray-50 shadow-none placeholder:text-[rgba(16,24,40,0.5)]"
         />
       </div>
 
@@ -157,7 +157,7 @@ const ChequeForm = ({
             placeholder="12,345.56"
             value={formData.amount}
             onChange={(e) => onInputChange("amount", e.target.value)}
-            className="flex-1 bg-gray-50 shadow-none placeholder:text-gray-700"
+            className="flex-1 bg-gray-50 shadow-none placeholder:text-[rgba(16,24,40,0.5)]"
           />
         </div>
       </div>

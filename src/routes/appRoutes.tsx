@@ -51,14 +51,14 @@ const ISOCertificationsPage = lazy(
         )
 );
 const ChequePrintingPage = lazy(
-    () => import("@/pages/banking/ChequePrintingPage")
+    () => import("@/pages/banking/ChequePrinting/ChequePrintingPage")
 );
 const BusinessContactsPage = lazy(
-    () => import("@/pages/banking/BusinessContactsPage")
+    () => import("@/pages/banking/ChequePrinting/BusinessContactsPage")
 );
-const NewChequePage = lazy(() => import("@/pages/banking/NewChequePage"));
+const NewChequePage = lazy(() => import("@/pages/banking/ChequePrinting/NewChequePage"));
 const ChequeManagerPage = lazy(
-    () => import("@/pages/banking/ChequeManagerPage")
+    () => import("@/pages/banking/ChequePrinting/ChequeManagerPage")
 );
 const MyAttendance = lazy(() => import("@/pages/myAttendance/MyAttendance"));
 const LeaveRequest = lazy(() => import("@/pages/leaveRequest/LeaveRequest"));
