@@ -3,9 +3,11 @@ import React from "react";
 export default function BadgePill({
   children,
   color = "gray",
+  className,
 }: {
   children: React.ReactNode;
   color?: "gray" | "green" | "sky" | "amber" | "rose" | "blue";
+  className?: string;
 }) {
   const map: Record<string, string> = {
     gray: "bg-gray-100 text-gray-700",
@@ -15,5 +17,5 @@ export default function BadgePill({
     rose: "bg-rose-100 text-rose-700",
     blue: "bg-blue-100 text-blue-700",
   };
-  return <span className={`px-2 py-1 rounded-full text-xs font-medium ${map[color]}`}>{children}</span>;
+  return <span className={`px-2 py-1 rounded-full text-xs font-medium ${map[color]} ${className}`}>{children}</span>;
 }

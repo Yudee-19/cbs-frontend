@@ -60,6 +60,9 @@ const NewChequePage = lazy(() => import("@/pages/banking/NewChequePage"));
 const ChequeManagerPage = lazy(
     () => import("@/pages/banking/ChequeManagerPage")
 );
+const CashFlowForecastPage = lazy(
+    () => import("@/pages/banking/CashFlowForecast/CashFlowForecastPage")
+);
 const MyAttendance = lazy(() => import("@/pages/myAttendance/MyAttendance"));
 const LeaveRequest = lazy(() => import("@/pages/leaveRequest/LeaveRequest"));
 const DashboardPage = lazy(() => import("@/pages/dashboard/dashboardPage"));
@@ -139,6 +142,14 @@ export const router = createBrowserRouter([
                 element: (
                     <Suspense fallback={<LoadingFallback />}>
                         <ChequeManagerPage />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "/banking/cash-flow-forecast",
+                element: (
+                    <Suspense fallback={<LoadingFallback />}>
+                        <CashFlowForecastPage />
                     </Suspense>
                 ),
             },

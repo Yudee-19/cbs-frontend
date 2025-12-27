@@ -66,7 +66,7 @@ export const menuItems: MenuItem[] = [
     children: [
       { id: "cheque", label: "Cheque Printing", icon: ReceiptText, path: "/banking/cheque-printing" , title: "Banking", subtitle:"user/Banking/Cheque Printing"},
       { id: "telex", label: "Telex Transfer", icon: FileText, path: "/banking/telex-transfer" ,title: "Banking", subtitle:"user/Banking/Telex Transfer" },
-      { id: "cashflow", label: "Cash Flow Forecast", icon: FileSpreadsheet, path: "/banking/cash-flow", title: "Banking", subtitle:"user/Banking/Cash Flow Forecast" },
+      { id: "cashflow", label: "Cash Flow Forecast", icon: FileSpreadsheet, path: "/banking/cash-flow-forecast", title: "Banking", subtitle:"user/Banking/Cash Flow Forecast" },
       { id: "daily-balance", label: "Daily Bank Balance", icon: Landmark, path: "/banking/daily-bank-balance",title: "Banking", subtitle:"user/Banking/Daily Bank Balance" },
       { id: "balance-sheet", label: "Balance Sheet", icon: Notebook, path: "/banking/balance-sheet", title: "Banking", subtitle:"user/Banking/Balance Sheet" },
       { id: "pnl", label: "P&L Statement", icon: CheckSquare, path: "/banking/pnl-statement", title: "Banking", subtitle:"user/Banking/P&L Statement" },
