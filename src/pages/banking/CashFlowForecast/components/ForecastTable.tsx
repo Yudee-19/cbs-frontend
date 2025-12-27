@@ -12,16 +12,12 @@ interface ForecastTableProps {
   forecasts: ForecastEntryWithRaw[];
   loading: boolean;
   onAddForecast: () => void;
-  onImportCSV: () => void;
-  onExportReport: () => void;
 }
 
 export const ForecastTable = ({
   forecasts,
   loading,
   onAddForecast,
-  onImportCSV,
-  onExportReport,
 }: ForecastTableProps) => {
   const [page, setPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(25);
@@ -58,7 +54,6 @@ export const ForecastTable = ({
               variant="outline"
               size="sm"
               className="h-9 px-3 flex items-center gap-2"
-              onClick={onImportCSV}
             >
               <Upload className="h-4 w-4" />
               Import CSV
@@ -67,7 +62,6 @@ export const ForecastTable = ({
               variant="outline"
               size="sm"
               className="h-9 px-3 flex items-center gap-2"
-              onClick={onExportReport}
             >
               <Download className="h-4 w-4" />
               Export Report

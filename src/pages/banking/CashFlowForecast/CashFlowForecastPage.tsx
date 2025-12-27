@@ -79,14 +79,6 @@ const CashFlowForecastPage = () => {
     }
   };
 
-  const handleImportCSV = () => {
-    window.open("https://company-documnets.onrender.com/api/forecasts/upload-csv", "_blank");
-  };
-
-  const handleExportReport = () => {
-    window.open("https://company-documnets.onrender.com/api/forecasts/export", "_blank");
-  };
-
   return (
     <div className="p-2 sm:p-4 h-full flex flex-col gap-4">
       {/* Summary Cards */}
@@ -99,8 +91,6 @@ const CashFlowForecastPage = () => {
         forecasts={forecasts}
         loading={loading}
         onAddForecast={handleAddForecast}
-        onImportCSV={handleImportCSV}
-        onExportReport={handleExportReport}
       />
 
       {/* Forecast Form Dialog */}
